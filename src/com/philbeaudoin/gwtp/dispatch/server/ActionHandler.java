@@ -34,10 +34,11 @@ public interface ActionHandler<A extends Action<R>, R extends Result> {
     Class<A> getActionType();
 
     /**
-     * Handles the specified action. If you want to build a
-     * compound action that can rollback automatically upon 
-     * failure, call {@link ExecutionContext#execute(Action)}.
-     * See <a href="http://code.google.com/p/gwt-dispatch/wiki/CompoundActions">here</a> for details. 
+     * Handles the specified action. If you want to build a compound action that
+     * can rollback automatically upon failure, call
+     * {@link ExecutionContext#execute(Action)}. See <a
+     * href="http://code.google.com/p/gwt-dispatch/wiki/CompoundActions"
+     * >here</a> for details.
      * 
      * @param <T>
      *            The Result type.
@@ -49,13 +50,14 @@ public interface ActionHandler<A extends Action<R>, R extends Result> {
      * @throws ActionException
      *             if there is a problem performing the specified action.
      */
-    R execute( A action, ExecutionContext context ) throws ActionException;
+    R execute(A action, ExecutionContext context) throws ActionException;
 
     /**
-     * Undoes the specified action. If you want to build a
-     * compound action that can rollback automatically upon 
-     * failure, call {@link ExecutionContext#undo(Action, Result)}.
-     * See <a href="http://code.google.com/p/gwt-dispatch/wiki/CompoundActions">here</a> for details. 
+     * Undoes the specified action. If you want to build a compound action that
+     * can rollback automatically upon failure, call
+     * {@link ExecutionContext#undo(Action, Result)}. See <a
+     * href="http://code.google.com/p/gwt-dispatch/wiki/CompoundActions"
+     * >here</a> for details.
      * 
      * @param action
      *            The action.
@@ -66,5 +68,5 @@ public interface ActionHandler<A extends Action<R>, R extends Result> {
      * @throws ActionException
      *             if there is a problem performing the specified action.
      */
-    void undo( A action, R result, ExecutionContext context ) throws ActionException;
+    void undo(A action, R result, ExecutionContext context) throws ActionException;
 }

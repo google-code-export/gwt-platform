@@ -35,28 +35,28 @@ import com.philbeaudoin.gwtp.dispatch.server.InstanceActionHandlerRegistry;
  * 
  */
 public final class ActionHandlerLinker {
-	private ActionHandlerLinker() {}
+    private ActionHandlerLinker() {}
 
-	@Inject
-	@SuppressWarnings("unchecked")
-	public static void linkHandlers(Injector injector, ActionHandlerRegistry registry) {
-		List<Binding<ActionHandlerMap>> bindings = injector.findBindingsByType(TypeLiteral.get(ActionHandlerMap.class));
+    @Inject
+    @SuppressWarnings("unchecked")
+    public static void linkHandlers(Injector injector, ActionHandlerRegistry registry) {
+        List<Binding<ActionHandlerMap>> bindings = injector.findBindingsByType(TypeLiteral.get(ActionHandlerMap.class));
 
-		if ( registry instanceof InstanceActionHandlerRegistry ) {
-			InstanceActionHandlerRegistry instanceRegistry = (InstanceActionHandlerRegistry) registry;
+        if (registry instanceof InstanceActionHandlerRegistry) {
+            InstanceActionHandlerRegistry instanceRegistry = (InstanceActionHandlerRegistry) registry;
 
-			for ( Binding<ActionHandlerMap> binding : bindings ) {
-				Class<? extends ActionHandler<?, ?>> handlerClass = binding.getProvider().get().getActionHandlerClass();
-				ActionHandler<?, ?> handler = injector.getInstance( handlerClass );
-				instanceRegistry.addHandler( handler );
-			}
-		} else if ( registry instanceof ClassActionHandlerRegistry ) {
-			ClassActionHandlerRegistry classRegistry = ( ClassActionHandlerRegistry ) registry;
+            for (Binding<ActionHandlerMap> binding : bindings) {
+                Class<? extends ActionHandler<?, ?>> handlerClass = binding.getProvider().get().getActionHandlerClass();
+                ActionHandler<?, ?> handler = injector.getInstance(handlerClass);
+                instanceRegistry.addHandler(handler);
+            }
+        } else if (registry instanceof ClassActionHandlerRegistry) {
+            ClassActionHandlerRegistry classRegistry = (ClassActionHandlerRegistry) registry;
 
-			for ( Binding<ActionHandlerMap> binding : bindings ) {
-				ActionHandlerMap map = binding.getProvider().get();
-				classRegistry.addHandlerClass( map.getActionClass(), map.getActionHandlerClass() );
-			}
-		} 
-	}
+            for (Binding<ActionHandlerMap> binding : bindings) {
+                ActionHandlerMap map = binding.getProvider().get();
+                classRegistry.addHandlerClass(map.getActionClass(), map.getActionHandlerClass());
+            }
+        }
+    }
 }

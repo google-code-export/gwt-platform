@@ -23,13 +23,19 @@ import com.philbeaudoin.gwtp.dispatch.server.AbstractDispatch;
 import com.philbeaudoin.gwtp.dispatch.server.ActionHandlerRegistry;
 import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
 
+/**
+ * Base dispatch class used by Guice.
+ * 
+ * @author Christian Goudreau
+ * @author David Paterson
+ */
 @Singleton
 public class GuiceDispatch extends AbstractDispatch {
     private final ActionHandlerRegistry handlerRegistry;
     private final SecureSessionValidatorRegistry secureSessionValidatorRegistry;
 
     @Inject
-    public GuiceDispatch( ActionHandlerRegistry handlerRegistry,  SecureSessionValidatorRegistry secureSessionValidatorRegistry) {
+    public GuiceDispatch(ActionHandlerRegistry handlerRegistry, SecureSessionValidatorRegistry secureSessionValidatorRegistry) {
         this.handlerRegistry = handlerRegistry;
         this.secureSessionValidatorRegistry = secureSessionValidatorRegistry;
     }
@@ -39,8 +45,8 @@ public class GuiceDispatch extends AbstractDispatch {
         return handlerRegistry;
     }
 
-	@Override
-	protected SecureSessionValidatorRegistry getSecureSessionValidatorRegistry() {
-		return secureSessionValidatorRegistry;
-	}
+    @Override
+    protected SecureSessionValidatorRegistry getSecureSessionValidatorRegistry() {
+        return secureSessionValidatorRegistry;
+    }
 }

@@ -43,10 +43,10 @@ public interface ExecutionContext {
      * @return The {@link Result}.
      * @throws ActionException
      *             if the action execution failed.
-     * @throws ServiceException 
+     * @throws ServiceException
      *             if the execution failed due to a service error.
      */
-    <A extends Action<R>, R extends Result> R execute( A action ) throws ActionException, ServiceException;
+    <A extends Action<R>, R extends Result> R execute(A action) throws ActionException, ServiceException;
 
     /**
      * Undoes an action in the current context. If the surrounding execution
@@ -61,7 +61,7 @@ public interface ExecutionContext {
      * @return The {@link Result}.
      * @throws ActionException
      *             if the action execution failed.
-     * @throws ServiceException 
+     * @throws ServiceException
      *             if the execution failed due to a service error.
      */
     <A extends Action<R>, R extends Result> void undo(A action, R result) throws ActionException, ServiceException;
