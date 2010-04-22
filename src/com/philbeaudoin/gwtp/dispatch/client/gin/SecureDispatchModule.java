@@ -22,7 +22,6 @@ import com.google.inject.Singleton;
 import com.philbeaudoin.gwtp.dispatch.client.DefaultExceptionHandler;
 import com.philbeaudoin.gwtp.dispatch.client.DispatchAsync;
 import com.philbeaudoin.gwtp.dispatch.client.ExceptionHandler;
-import com.philbeaudoin.gwtp.dispatch.client.appengine.AppEngineSecureSessionAccessor;
 import com.philbeaudoin.gwtp.dispatch.client.secure.CookieSecureSessionAccessor;
 import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchAsync;
 import com.philbeaudoin.gwtp.dispatch.client.secure.SecureSessionAccessor;

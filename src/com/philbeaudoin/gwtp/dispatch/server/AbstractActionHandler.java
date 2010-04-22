@@ -36,7 +36,7 @@ public abstract class AbstractActionHandler<A extends Action<R>, R extends Resul
 
     private final Class<A> actionType;
 
-    public AbstractActionHandler( Class<A> actionType ) {
+    public AbstractActionHandler(Class<A> actionType) {
         this.actionType = actionType;
     }
 

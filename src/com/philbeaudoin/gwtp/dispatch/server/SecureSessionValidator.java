@@ -17,6 +17,7 @@
 package com.philbeaudoin.gwtp.dispatch.server;
 
 import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchService;
+import com.philbeaudoin.gwtp.dispatch.shared.Action;
 
 /**
  * Implementors must provide an implementation of this interface and provide it
@@ -27,5 +28,15 @@ import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchService;
  * @author Christian Goudreau
  */
 public interface SecureSessionValidator {
-    boolean isValid(String sessionId);
+    /**
+     * Will tell the classes that implements {@link AbstractDispatch} if he can
+     * or cannot execute the {@link Action}.
+     * 
+     * @param sessionId
+     *            The users sessionId to compare with the server sessionId if
+     *            desired
+     * @return True or false depending if he can or cannot execute the
+     *         {@link Action}
+     */
+    public boolean isValid(String sessionId);
 }

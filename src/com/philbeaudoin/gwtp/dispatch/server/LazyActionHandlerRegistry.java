@@ -27,7 +27,6 @@ import com.philbeaudoin.gwtp.dispatch.shared.Result;
  * implementations <b>must</b> have a public, default constructor.
  * 
  * @author David Peterson
- * @author Christian Goudreau
  */
 public class LazyActionHandlerRegistry implements ClassActionHandlerRegistry {
     private final Map<Class<? extends Action<?>>, Class<? extends ActionHandler<?, ?>>> handlerClasses;
@@ -38,13 +37,13 @@ public class LazyActionHandlerRegistry implements ClassActionHandlerRegistry {
         handlers = new java.util.HashMap<Class<? extends Action<?>>, ActionHandler<?, ?>>(100);
     }
 
-    public <A extends Action<R>, R extends Result> void addHandlerClass( Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass ) {
+    public <A extends Action<R>, R extends Result> void addHandlerClass(Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass) {
         handlerClasses.put(actionClass, handlerClass);
     }
 
-    public <A extends Action<R>, R extends Result> void removeHandlerClass( Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass ) {
+    public <A extends Action<R>, R extends Result> void removeHandlerClass(Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass) {
         Class<? extends ActionHandler<?, ?>> oldHandlerClass = handlerClasses.get(actionClass);
-       
+
         if (oldHandlerClass == handlerClass) {
             handlerClasses.remove(actionClass);
             handlers.remove(actionClass);
@@ -52,27 +51,27 @@ public class LazyActionHandlerRegistry implements ClassActionHandlerRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    public <A extends Action<R>, R extends Result> ActionHandler<A, R> findHandler( A action ) {
-        ActionHandler<?, ?> handler = handlers.get( action.getClass() );
-        
-        if ( handler == null ) {
-            Class<? extends ActionHandler<?, ?>> handlerClass = handlerClasses.get( action.getClass() );
-            if ( handlerClass != null ) {
-                handler = createInstance( handlerClass );
-                if ( handler != null )
-                    handlers.put( handler.getActionType(), handler );
+    public <A extends Action<R>, R extends Result> ActionHandler<A, R> findHandler(A action) {
+        ActionHandler<?, ?> handler = handlers.get(action.getClass());
+
+        if (handler == null) {
+            Class<? extends ActionHandler<?, ?>> handlerClass = handlerClasses.get(action.getClass());
+            if (handlerClass != null) {
+                handler = createInstance(handlerClass);
+                if (handler != null)
+                    handlers.put(handler.getActionType(), handler);
             }
         }
 
         return (ActionHandler<A, R>) handler;
     }
 
-    protected ActionHandler<?, ?> createInstance( Class<? extends ActionHandler<?, ?>> handlerClass ) {
+    protected ActionHandler<?, ?> createInstance(Class<? extends ActionHandler<?, ?>> handlerClass) {
         try {
             return handlerClass.newInstance();
-        } catch ( InstantiationException e ) {
+        } catch (InstantiationException e) {
             e.printStackTrace();
-        } catch ( IllegalAccessException e ) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;

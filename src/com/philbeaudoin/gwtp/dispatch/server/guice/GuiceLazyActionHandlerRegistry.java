@@ -37,13 +37,13 @@ public class GuiceLazyActionHandlerRegistry extends LazyActionHandlerRegistry {
     private final Injector injector;
 
     @Inject
-    public GuiceLazyActionHandlerRegistry( Injector injector ) {
+    public GuiceLazyActionHandlerRegistry(Injector injector) {
         this.injector = injector;
     }
 
     @Override
-    protected ActionHandler<?, ?> createInstance( Class<? extends ActionHandler<?, ?>> handlerClass ) {
-        return injector.getInstance( handlerClass );
+    protected ActionHandler<?, ?> createInstance(Class<? extends ActionHandler<?, ?>> handlerClass) {
+        return injector.getInstance(handlerClass);
     }
 
 }

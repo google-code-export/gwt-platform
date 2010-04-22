@@ -34,7 +34,8 @@ import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
  * respectively), pass the override values into the constructor for this module
  * and ensure it is installed <b>before</b> any {@link ActionHandlerModule}
  * instances.
- *
+ * 
+ * @author Christian Goudreau
  * @author David Peterson
  */
 public class ServerDispatchModule extends AbstractModule {
@@ -47,12 +48,11 @@ public class ServerDispatchModule extends AbstractModule {
     }
 
     public ServerDispatchModule(Class<? extends Dispatch> dispatchClass) {
-        this( dispatchClass, DefaultActionHandlerRegistry.class, DefaultSecureSessionValidatorRegistry.class);
+        this(dispatchClass, DefaultActionHandlerRegistry.class, DefaultSecureSessionValidatorRegistry.class);
     }
 
-    public ServerDispatchModule( Class<? extends Dispatch> dispatchClass,
-                                 Class<? extends ActionHandlerRegistry> actionHandlerRegistryClass,
-                                 Class<? extends SecureSessionValidatorRegistry> secureSessionValidatorRegistryClass) {
+    public ServerDispatchModule(Class<? extends Dispatch> dispatchClass, Class<? extends ActionHandlerRegistry> actionHandlerRegistryClass,
+            Class<? extends SecureSessionValidatorRegistry> secureSessionValidatorRegistryClass) {
         this.dispatchClass = dispatchClass;
         this.actionHandlerRegistryClass = actionHandlerRegistryClass;
         this.secureSessionValidatorRegistryClass = secureSessionValidatorRegistryClass;
@@ -60,25 +60,24 @@ public class ServerDispatchModule extends AbstractModule {
 
     @Override
     protected final void configure() {
-        bind(ActionHandlerRegistry.class).to(getActionHandlerRegistryClass()).in( Singleton.class );
+        bind(ActionHandlerRegistry.class).to(getActionHandlerRegistryClass()).in(Singleton.class);
         bind(SecureSessionValidatorRegistry.class).to(getSecureSessionValidatorRegistryClass()).in(Singleton.class);
-        bind(Dispatch.class).to( getDispatchClass());
+        bind(Dispatch.class).to(getDispatchClass());
 
         // This will bind registered handlers to the registry.
         if (InstanceActionHandlerRegistry.class.isAssignableFrom(getActionHandlerRegistryClass()))
             requestStaticInjection(ActionHandlerLinker.class);
-        
-        if(InstanceSecureSessionValidatorRegistry.class.isAssignableFrom(getSecureSessionValidatorRegistryClass()))
-        	requestStaticInjection(SecureSessionValidatorLinker.class);
+
+        // This will bind registered validators to the registry.
+        if (InstanceSecureSessionValidatorRegistry.class.isAssignableFrom(getSecureSessionValidatorRegistryClass()))
+            requestStaticInjection(SecureSessionValidatorLinker.class);
     }
 
-
-
-	/**
+    /**
      * The class returned by this method is bound to the {@link Dispatch}
      * service. Subclasses may override this method to provide custom
      * implementations. Defaults to {@link GuiceDispatch}.
-     *
+     * 
      * @return The {@link Dispatch} implementation class.
      */
     protected Class<? extends Dispatch> getDispatchClass() {
@@ -90,7 +89,7 @@ public class ServerDispatchModule extends AbstractModule {
      * {@link ActionHandlerRegistry}. Subclasses may override this method to
      * provide custom implementations. Defaults to
      * {@link DefaultActionHandlerRegistry}.
-     *
+     * 
      * @return The {@link ActionHandlerRegistry} implementation class.
      */
     protected Class<? extends ActionHandlerRegistry> getActionHandlerRegistryClass() {
@@ -98,15 +97,15 @@ public class ServerDispatchModule extends AbstractModule {
     }
 
     protected Class<? extends SecureSessionValidatorRegistry> getSecureSessionValidatorRegistryClass() {
-		return secureSessionValidatorRegistryClass;
-	}
-    
+        return secureSessionValidatorRegistryClass;
+    }
+
     /**
      * Override so that only one instance of this class will ever be installed
      * in an {@link Injector}.
      */
     @Override
-    public boolean equals( Object obj ) {
+    public boolean equals(Object obj) {
         return obj instanceof ServerDispatchModule;
     }
 

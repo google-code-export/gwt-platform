@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.shared.secure;
+package com.philbeaudoin.gwtp.dispatch.shared;
 
-import com.philbeaudoin.gwtp.dispatch.shared.ServiceException;
 
 public class InvalidSessionException extends ServiceException {
 

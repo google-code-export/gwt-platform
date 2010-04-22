@@ -29,8 +29,8 @@ public interface ActionHandlerRegistry {
      *            The action.
      * @return The handler.
      */
-    public <A extends Action<R>, R extends Result> ActionHandler<A, R> findHandler( A action );
-    
+    public <A extends Action<R>, R extends Result> ActionHandler<A, R> findHandler(A action);
+
     /**
      * Clears all registered handlers from the registry.
      */

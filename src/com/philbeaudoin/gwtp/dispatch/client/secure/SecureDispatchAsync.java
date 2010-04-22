@@ -22,8 +22,8 @@ import com.philbeaudoin.gwtp.dispatch.client.AbstractDispatchAsync;
 import com.philbeaudoin.gwtp.dispatch.client.DispatchAsync;
 import com.philbeaudoin.gwtp.dispatch.client.ExceptionHandler;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
+import com.philbeaudoin.gwtp.dispatch.shared.InvalidSessionException;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
-import com.philbeaudoin.gwtp.dispatch.shared.secure.InvalidSessionException;
 
 /**
  * This class is the default implementation of {@link DispatchAsync}, which is
