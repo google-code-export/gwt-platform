@@ -16,35 +16,53 @@
 
 package com.philbeaudoin.gwtp.dispatch.client;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchService;
+import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchServiceAsync;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
- * An abstract base class that provides methods that can be called to handle success or failure
- * results from the remote service. These should be called by the implementation of
- * {@link #execute(com.philbeaudoin.gwtp.dispatch.shared.Action, com.google.gwt.user.client.rpc.AsyncCallback)}.
+ * An abstract base class that provides methods that can be called to handle
+ * success or failure results from the remote service. These should be called by
+ * the implementation of
+ * {@link #execute(com.philbeaudoin.gwtp.dispatch.shared.Action, com.google.gwt.user.client.rpc.AsyncCallback)}
+ * .
  * 
  * @author David Peterson
+ * @author Christian Goudreau
  */
 public abstract class AbstractDispatchAsync implements DispatchAsync {
+    private static final SecureDispatchServiceAsync realService = GWT.create(SecureDispatchService.class);
+    private static final String baseUrl = ((ServiceDefTarget) realService).getServiceEntryPoint() + "/";
 
     private final ExceptionHandler exceptionHandler;
 
-    public AbstractDispatchAsync( ExceptionHandler exceptionHandler ) {
+    public AbstractDispatchAsync(ExceptionHandler exceptionHandler) {
         this.exceptionHandler = exceptionHandler;
     }
 
-    protected <A extends Action<R>, R extends Result> void onFailure( A action, Throwable caught, final AsyncCallback<R> callback ) {
-        if ( exceptionHandler != null && exceptionHandler.onFailure( caught ) == ExceptionHandler.Status.STOP ) {
+    protected <A extends Action<R>, R extends Result> void onFailure(A action, Throwable caught, final AsyncCallback<R> callback) {
+        if (exceptionHandler != null && exceptionHandler.onFailure(caught) == ExceptionHandler.Status.STOP) {
             return;
         }
 
-        callback.onFailure( caught );
+        callback.onFailure(caught);
     }
 
-    protected <A extends Action<R>, R extends Result> void onSuccess( A action, R result, final AsyncCallback<R> callback ) {
-        callback.onSuccess( result );
+    protected <A extends Action<R>, R extends Result> void onSuccess(A action, R result, final AsyncCallback<R> callback) {
+        callback.onSuccess(result);
     }
 
+    public <A extends Action<R>, R extends Result> void execute(String sessionId, Action<?> action, AsyncCallback<Result> callback) {
+        String className = action.getClass().getName();
+        int namePos = className.lastIndexOf(".") + 1;
+        className = className.substring(namePos);
+
+        ((ServiceDefTarget) realService).setServiceEntryPoint(baseUrl + className);
+
+        realService.execute(sessionId, action, callback);
+    }
 }

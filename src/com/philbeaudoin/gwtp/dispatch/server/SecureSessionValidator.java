@@ -38,5 +38,5 @@ public interface SecureSessionValidator {
      * @return True or false depending if he can or cannot execute the
      *         {@link Action}
      */
-    public boolean isValid(String sessionId);
+    public boolean isValid(String clientSessionId);
 }
