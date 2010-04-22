@@ -33,7 +33,7 @@ public interface InstanceActionHandlerRegistry extends ActionHandlerRegistry {
      * @param handler
      *            The action handler.
      */
-    public <A extends Action<R>, R extends Result> void addHandler( ActionHandler<A, R> handler );
+    public <A extends Action<R>, R extends Result> void addHandler( ActionHandler<A,R> handler );
 
     /**
      * Removes the specified handler.

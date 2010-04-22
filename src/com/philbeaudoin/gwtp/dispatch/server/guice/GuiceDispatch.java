@@ -21,15 +21,17 @@ import com.google.inject.Singleton;
 
 import com.philbeaudoin.gwtp.dispatch.server.AbstractDispatch;
 import com.philbeaudoin.gwtp.dispatch.server.ActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
 
 @Singleton
 public class GuiceDispatch extends AbstractDispatch {
-
     private final ActionHandlerRegistry handlerRegistry;
+    private final SecureSessionValidatorRegistry secureSessionValidatorRegistry;
 
     @Inject
-    public GuiceDispatch( ActionHandlerRegistry handlerRegistry ) {
+    public GuiceDispatch( ActionHandlerRegistry handlerRegistry,  SecureSessionValidatorRegistry secureSessionValidatorRegistry) {
         this.handlerRegistry = handlerRegistry;
+        this.secureSessionValidatorRegistry = secureSessionValidatorRegistry;
     }
 
     @Override
@@ -37,4 +39,8 @@ public class GuiceDispatch extends AbstractDispatch {
         return handlerRegistry;
     }
 
+	@Override
+	protected SecureSessionValidatorRegistry getSecureSessionValidatorRegistry() {
+		return secureSessionValidatorRegistry;
+	}
 }

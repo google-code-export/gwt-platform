@@ -38,7 +38,7 @@ public interface Dispatch {
      * @throws ServiceException 
      *             if the execution failed due to a service error.
      */
-    <A extends Action<R>, R extends Result> R execute( A action ) throws ActionException, ServiceException;
+    <A extends Action<R>, R extends Result> R execute(A action ) throws ActionException, ServiceException;
 
     /**
      * Undoes a previously executed action.
@@ -56,4 +56,6 @@ public interface Dispatch {
      *             if the execution failed due to a service error.
      */
     <A extends Action<R>, R extends Result> void undo(A action, R result) throws ActionException, ServiceException;
+    
+    void setSessionId(String sessionId);
 }

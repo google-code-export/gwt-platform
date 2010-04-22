@@ -21,8 +21,11 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.philbeaudoin.gwtp.dispatch.server.ActionHandlerRegistry;
 import com.philbeaudoin.gwtp.dispatch.server.DefaultActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.DefaultSecureSessionValidatorRegistry;
 import com.philbeaudoin.gwtp.dispatch.server.Dispatch;
 import com.philbeaudoin.gwtp.dispatch.server.InstanceActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.InstanceSecureSessionValidatorRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
 
 /**
  * This module will configure the implementation for the {@link Dispatch} and
@@ -35,36 +38,43 @@ import com.philbeaudoin.gwtp.dispatch.server.InstanceActionHandlerRegistry;
  * @author David Peterson
  */
 public class ServerDispatchModule extends AbstractModule {
-
     private Class<? extends Dispatch> dispatchClass;
-
     private Class<? extends ActionHandlerRegistry> actionHandlerRegistryClass;
+    private Class<? extends SecureSessionValidatorRegistry> secureSessionValidatorRegistryClass;
 
     public ServerDispatchModule() {
-        this( GuiceDispatch.class, DefaultActionHandlerRegistry.class );
+        this(GuiceDispatch.class, DefaultActionHandlerRegistry.class, DefaultSecureSessionValidatorRegistry.class);
     }
 
-    public ServerDispatchModule( Class<? extends Dispatch> dispatchClass ) {
-        this( dispatchClass, DefaultActionHandlerRegistry.class );
+    public ServerDispatchModule(Class<? extends Dispatch> dispatchClass) {
+        this( dispatchClass, DefaultActionHandlerRegistry.class, DefaultSecureSessionValidatorRegistry.class);
     }
 
     public ServerDispatchModule( Class<? extends Dispatch> dispatchClass,
-                                 Class<? extends ActionHandlerRegistry> actionHandlerRegistryClass ) {
+                                 Class<? extends ActionHandlerRegistry> actionHandlerRegistryClass,
+                                 Class<? extends SecureSessionValidatorRegistry> secureSessionValidatorRegistryClass) {
         this.dispatchClass = dispatchClass;
         this.actionHandlerRegistryClass = actionHandlerRegistryClass;
+        this.secureSessionValidatorRegistryClass = secureSessionValidatorRegistryClass;
     }
 
     @Override
     protected final void configure() {
-        bind( ActionHandlerRegistry.class ).to( getActionHandlerRegistryClass() ).in( Singleton.class );
-        bind( Dispatch.class ).to( getDispatchClass() );
+        bind(ActionHandlerRegistry.class).to(getActionHandlerRegistryClass()).in( Singleton.class );
+        bind(SecureSessionValidatorRegistry.class).to(getSecureSessionValidatorRegistryClass()).in(Singleton.class);
+        bind(Dispatch.class).to( getDispatchClass());
 
         // This will bind registered handlers to the registry.
-        if ( InstanceActionHandlerRegistry.class.isAssignableFrom( getActionHandlerRegistryClass() ) )
-            requestStaticInjection( ActionHandlerLinker.class );
+        if (InstanceActionHandlerRegistry.class.isAssignableFrom(getActionHandlerRegistryClass()))
+            requestStaticInjection(ActionHandlerLinker.class);
+        
+        if(InstanceSecureSessionValidatorRegistry.class.isAssignableFrom(getSecureSessionValidatorRegistryClass()))
+        	requestStaticInjection(SecureSessionValidatorLinker.class);
     }
 
-    /**
+
+
+	/**
      * The class returned by this method is bound to the {@link Dispatch}
      * service. Subclasses may override this method to provide custom
      * implementations. Defaults to {@link GuiceDispatch}.
@@ -87,6 +97,10 @@ public class ServerDispatchModule extends AbstractModule {
         return actionHandlerRegistryClass;
     }
 
+    protected Class<? extends SecureSessionValidatorRegistry> getSecureSessionValidatorRegistryClass() {
+		return secureSessionValidatorRegistryClass;
+	}
+    
     /**
      * Override so that only one instance of this class will ever be installed
      * in an {@link Injector}.

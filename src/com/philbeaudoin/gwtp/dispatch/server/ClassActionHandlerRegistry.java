@@ -38,8 +38,7 @@ public interface ClassActionHandlerRegistry extends ActionHandlerRegistry {
      * @param handlerClass
      *            The handler class.
      */
-    public <A extends Action<R>, R extends Result> void addHandlerClass( Class<A> actionClass,
-            Class<? extends ActionHandler<A, R>> handlerClass );
+    public <A extends Action<R>, R extends Result> void addHandlerClass( Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass );
 
     /**
      * Removes any registration of the specified class, as well as any instances
@@ -47,6 +46,5 @@ public interface ClassActionHandlerRegistry extends ActionHandlerRegistry {
      * 
      * @param handlerClass
      */
-    public <A extends Action<R>, R extends Result> void removeHandlerClass( Class<A> actionClass,
-            Class<? extends ActionHandler<A, R>> handlerClass );
+    public <A extends Action<R>, R extends Result> void removeHandlerClass( Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass );
 }
