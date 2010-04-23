@@ -18,7 +18,6 @@ package com.philbeaudoin.gwtp.dispatch.server.guice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import com.philbeaudoin.gwtp.dispatch.server.AbstractDispatch;
 import com.philbeaudoin.gwtp.dispatch.server.ActionHandlerRegistry;
 import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;

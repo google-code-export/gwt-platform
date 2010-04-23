@@ -18,6 +18,7 @@ package com.philbeaudoin.gwtp.dispatch.server;
 
 /**
  * The default {@link SecureSessionValidator} implementation.
+ * It'll validate every action.
  * 
  * @author Christian Goudreau
  */

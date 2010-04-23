@@ -56,7 +56,7 @@ public abstract class AbstractDispatchAsync implements DispatchAsync {
         callback.onSuccess(result);
     }
 
-    public <A extends Action<R>, R extends Result> void execute(String sessionId, Action<?> action, AsyncCallback<Result> callback) {
+    protected <A extends Action<R>, R extends Result> void execute(String sessionId, Action<?> action, AsyncCallback<Result> callback) {
         String className = action.getClass().getName();
         int namePos = className.lastIndexOf(".") + 1;
         className = className.substring(namePos);

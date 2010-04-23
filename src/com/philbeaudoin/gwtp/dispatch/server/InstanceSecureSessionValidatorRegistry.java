@@ -21,7 +21,7 @@ import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
  * This is a subclass of {@link SecureSessionValidatorRegistry} wich allows
- * registration of validators by passing
+ * registration of validators by passing in the handler instance directly.
  * 
  * @author Christian Goudreau
  */
