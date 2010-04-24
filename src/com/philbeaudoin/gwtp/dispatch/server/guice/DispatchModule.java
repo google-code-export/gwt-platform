@@ -18,15 +18,17 @@ package com.philbeaudoin.gwtp.dispatch.server.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.internal.UniqueAnnotations;
-import com.philbeaudoin.gwtp.dispatch.server.ActionHandler;
-import com.philbeaudoin.gwtp.dispatch.server.DefaultSecureSessionValidator;
-import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidator;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandler;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandlerMap;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.DefaultSessionValidator;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidator;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidatorMap;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
  * Base Dispatch module that will bind {@link Action}s to {@link ActionHandler}s
- * and {@link SecureSessionValidator}. Your own Guice modules should extend this
+ * and {@link SessionValidator}. Your own Guice modules should extend this
  * class.
  * 
  * @author Christian Goudreau
@@ -34,8 +36,8 @@ import com.philbeaudoin.gwtp.dispatch.shared.Result;
  */
 public abstract class DispatchModule extends AbstractModule {
     /**
-     * Implementation of {@link SecureSessionValidatorMap} that links
-     * {@link Action}s to {@link SecureSessionValidator}s
+     * Implementation of {@link SessionValidatorMap} that links
+     * {@link Action}s to {@link SessionValidator}s
      * 
      * @param <A>
      *            Type of {@link Action}
@@ -44,11 +46,11 @@ public abstract class DispatchModule extends AbstractModule {
      * 
      * @author Christian Goudreau
      */
-    private static class SecureSessionValidatorMapImpl<A extends Action<R>, R extends Result> implements SecureSessionValidatorMap<A, R> {
+    private static class SecureSessionValidatorMapImpl<A extends Action<R>, R extends Result> implements SessionValidatorMap<A, R> {
         private final Class<A> actionClass;
-        private final Class<? extends SecureSessionValidator> secureSessionValidator;
+        private final Class<? extends SessionValidator> secureSessionValidator;
 
-        public SecureSessionValidatorMapImpl(Class<A> actionClass, Class<? extends SecureSessionValidator> secureSessionValidator) {
+        public SecureSessionValidatorMapImpl(Class<A> actionClass, Class<? extends SessionValidator> secureSessionValidator) {
             this.actionClass = actionClass;
             this.secureSessionValidator = secureSessionValidator;
         }
@@ -59,7 +61,7 @@ public abstract class DispatchModule extends AbstractModule {
         }
 
         @Override
-        public Class<? extends SecureSessionValidator> getSecureSessionValidatorClass() {
+        public Class<? extends SessionValidator> getSecureSessionValidatorClass() {
             return secureSessionValidator;
         }
     }
@@ -101,26 +103,14 @@ public abstract class DispatchModule extends AbstractModule {
         configureHandlers();
     }
 
-    protected abstract void configureHandlers();
-
     /**
-     * @param <A>
-     *            Type of {@link Action}
-     * @param <R>
-     *            Type of {@link Result}
-     * @param actionClass
-     *            Implementation of {@link Action} to link and bind
-     * @param handlerClass
-     *            Implementation of {@link ActionHandler} to link and bind
-     * @param secureSessionValidator
-     *            Implementation of {@link SecureSessionValidator} to link and
-     *            bind
+     * Override this method to configure your handlers. Use
+     * calls to {@link #bindHandler()} to register actions that
+     * do not need any specific security validation. Use calls to
+     * {@link #bindSecureHandler()} if you need a specific type
+     * validation.
      */
-    protected <A extends Action<R>, R extends Result> void bindSecureHandler(Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass,
-            Class<? extends SecureSessionValidator> secureSessionValidator) {
-        bind(SecureSessionValidatorMap.class).annotatedWith(UniqueAnnotations.create()).toInstance(new SecureSessionValidatorMapImpl<A, R>(actionClass, secureSessionValidator));
-        bind(ActionHandlerMap.class).annotatedWith(UniqueAnnotations.create()).toInstance(new ActionHandlerMapImpl<A, R>(actionClass, handlerClass));
-    }
+    protected abstract void configureHandlers();
 
     /**
      * @param <A>
@@ -134,6 +124,25 @@ public abstract class DispatchModule extends AbstractModule {
      */
     protected <A extends Action<R>, R extends Result> void bindHandler(Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass) {
         bind(ActionHandlerMap.class).annotatedWith(UniqueAnnotations.create()).toInstance(new ActionHandlerMapImpl<A, R>(actionClass, handlerClass));
-        bind(SecureSessionValidatorMap.class).annotatedWith(UniqueAnnotations.create()).toInstance(new SecureSessionValidatorMapImpl<A, R>(actionClass, DefaultSecureSessionValidator.class));
+        bind(SessionValidatorMap.class).annotatedWith(UniqueAnnotations.create()).toInstance(new SecureSessionValidatorMapImpl<A, R>(actionClass, DefaultSessionValidator.class));
     }
+    
+    /**
+     * @param <A>
+     *            Type of {@link Action}
+     * @param <R>
+     *            Type of {@link Result}
+     * @param actionClass
+     *            Implementation of {@link Action} to link and bind
+     * @param handlerClass
+     *            Implementation of {@link ActionHandler} to link and bind
+     * @param secureSessionValidator
+     *            Implementation of {@link SessionValidator} to link and
+     *            bind
+     */
+    protected <A extends Action<R>, R extends Result> void bindHandler(Class<A> actionClass, Class<? extends ActionHandler<A, R>> handlerClass,
+            Class<? extends SessionValidator> secureSessionValidator) {
+        bind(SessionValidatorMap.class).annotatedWith(UniqueAnnotations.create()).toInstance(new SecureSessionValidatorMapImpl<A, R>(actionClass, secureSessionValidator));
+        bind(ActionHandlerMap.class).annotatedWith(UniqueAnnotations.create()).toInstance(new ActionHandlerMapImpl<A, R>(actionClass, handlerClass));
+    }    
 }

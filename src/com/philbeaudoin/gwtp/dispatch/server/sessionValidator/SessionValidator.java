@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server;
+package com.philbeaudoin.gwtp.dispatch.server.sessionValidator;
 
-import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchService;
+import com.philbeaudoin.gwtp.dispatch.client.DispatchService;
+import com.philbeaudoin.gwtp.dispatch.server.AbstractDispatch;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 
 /**
  * Implementors must provide an implementation of this interface and provide it
- * to the {@link SecureDispatchService} implementation so that it can check for
+ * to the {@link DispatchService} implementation so that it can check for
  * valid session ids.
  * 
  * @author David Peterson
  * @author Christian Goudreau
  */
-public interface SecureSessionValidator {
+public interface SessionValidator {
     /**
      * Will tell the classes that implements {@link AbstractDispatch} if he can
      * or cannot execute the {@link Action}.

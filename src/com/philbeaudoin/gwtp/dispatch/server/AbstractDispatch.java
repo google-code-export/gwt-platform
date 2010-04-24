@@ -18,6 +18,11 @@ package com.philbeaudoin.gwtp.dispatch.server;
 
 import java.util.List;
 
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandler;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionResult;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidator;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidatorRegistry;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.ActionException;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
@@ -34,10 +39,11 @@ import com.philbeaudoin.gwtp.dispatch.shared.UnsupportedActionException;
 public abstract class AbstractDispatch implements Dispatch {
   private static class DefaultExecutionContext implements ExecutionContext {
     private final AbstractDispatch dispatch;
-
+    private final String sessionId;
     private final List<ActionResult<?, ?>> actionResults;
 
-    private DefaultExecutionContext(AbstractDispatch dispatch) {
+    private DefaultExecutionContext(String sessionId, AbstractDispatch dispatch) {
+      this.sessionId = sessionId;
       this.dispatch = dispatch;
       this.actionResults = new java.util.ArrayList<ActionResult<?, ?>>();
     }
@@ -45,7 +51,7 @@ public abstract class AbstractDispatch implements Dispatch {
     @Override
     public <A extends Action<R>, R extends Result> R execute(A action)
         throws ActionException, ServiceException {
-      R result = dispatch.doExecute(action, this);
+      R result = dispatch.doExecute(sessionId, action, this);
       actionResults.add(new ActionResult<A, R>(action, result, true));
       return result;
     }
@@ -53,7 +59,7 @@ public abstract class AbstractDispatch implements Dispatch {
     @Override
     public <A extends Action<R>, R extends Result> void undo(A action, R result)
         throws ActionException, ServiceException {
-      dispatch.doExecute(action, this);
+      dispatch.doExecute(sessionId, action, this);
       actionResults.add(new ActionResult<A, R>(action, result, false));
     }
 
@@ -66,7 +72,7 @@ public abstract class AbstractDispatch implements Dispatch {
      *           If there is a low level problem while rolling back.
      */
     private void rollback() throws ActionException, ServiceException {
-      DefaultExecutionContext ctx = new DefaultExecutionContext(dispatch);
+      DefaultExecutionContext ctx = new DefaultExecutionContext(sessionId, dispatch);
       for (int i = actionResults.size() - 1; i >= 0; i--) {
         ActionResult<?, ?> actionResult = actionResults.get(i);
         rollback(actionResult, ctx);
@@ -78,24 +84,26 @@ public abstract class AbstractDispatch implements Dispatch {
         throws ActionException, ServiceException {
       if (actionResult.isExecuted())
         dispatch
-            .doUndo(actionResult.getAction(), actionResult.getResult(), ctx);
+            .doUndo(sessionId, actionResult.getAction(), actionResult.getResult(), ctx);
       else
-        dispatch.doExecute(actionResult.getAction(), ctx);
+        dispatch.doExecute(sessionId, actionResult.getAction(), ctx);
     }
   };
 
   protected abstract ActionHandlerRegistry getHandlerRegistry();
-
-  protected abstract SecureSessionValidatorRegistry getSecureSessionValidatorRegistry();
-
-  private String sessionID;
+  protected abstract SessionValidatorRegistry getSecureSessionValidatorRegistry();
 
   @Override
-  public <A extends Action<R>, R extends Result> R execute(A action)
+  public <A extends Action<R>, R extends Result> R execute(A action) throws ActionException, ServiceException {
+      return execute(null, action);
+  } 
+  
+  @Override
+  public <A extends Action<R>, R extends Result> R execute(String sessionId, A action)
       throws ActionException, ServiceException {
-    DefaultExecutionContext ctx = new DefaultExecutionContext(this);
+    DefaultExecutionContext ctx = new DefaultExecutionContext(sessionId, this);
     try {
-      return doExecute(action, ctx);
+      return doExecute(sessionId, action, ctx);
     } catch (ActionException e) {
       ctx.rollback();
       throw e;
@@ -104,13 +112,18 @@ public abstract class AbstractDispatch implements Dispatch {
       throw e;
     }
   }
+  
+  @Override
+  public <A extends Action<R>, R extends Result> void undo(A action, R result) throws ActionException, ServiceException {
+      undo(null, action, result);
+  }
 
   @Override
-  public <A extends Action<R>, R extends Result> void undo(A action, R result)
+  public <A extends Action<R>, R extends Result> void undo(String sessionId, A action, R result)
       throws ActionException, ServiceException {
-    DefaultExecutionContext ctx = new DefaultExecutionContext(this);
+    DefaultExecutionContext ctx = new DefaultExecutionContext(sessionId, this);
     try {
-      doUndo(action, result, ctx);
+      doUndo(sessionId, action, result, ctx);
     } catch (ActionException e) {
       ctx.rollback();
       throw e;
@@ -122,7 +135,7 @@ public abstract class AbstractDispatch implements Dispatch {
 
   /**
    * Every single action will be executed by this function and validated by the
-   * {@link SecureSessionValidator}.
+   * {@link SessionValidator}.
    * 
    * @param <A>
    *          Type of associated {@link Action}
@@ -136,13 +149,14 @@ public abstract class AbstractDispatch implements Dispatch {
    * @throws ActionException
    * @throws ServiceException
    */
-  private <A extends Action<R>, R extends Result> R doExecute(A action,
+  private <A extends Action<R>, R extends Result> R doExecute(String sessionId, A action,
       ExecutionContext ctx) throws ActionException, ServiceException {
     ActionHandler<A, R> handler = findHandler(action);
-    SecureSessionValidator secureSessionValidator = findSecureSessionValidator(action);
+    
+    SessionValidator secureSessionValidator = findSecureSessionValidator(action);
 
     try {
-      if (secureSessionValidator.isValid(sessionID))
+      if (secureSessionValidator.isValid(sessionId))
         return handler.execute(action, ctx);
       else
         throw new ActionException("Insufficient rights");
@@ -153,11 +167,15 @@ public abstract class AbstractDispatch implements Dispatch {
     }
   }
 
-  private <A extends Action<R>, R extends Result> void doUndo(A action,
+  private <A extends Action<R>, R extends Result> void doUndo(String sessionId, A action,
       R result, ExecutionContext ctx) throws ActionException, ServiceException {
+      
+    SessionValidator secureSessionValidator = findSecureSessionValidator(action);
+      
     ActionHandler<A, R> handler = findHandler(action);
     try {
-      handler.undo(action, result, ctx);
+      if (secureSessionValidator.isValid(sessionId))
+        handler.undo(action, result, ctx);
     } catch (ActionException e) {
       throw e;
     } catch (Exception cause) {
@@ -174,19 +192,14 @@ public abstract class AbstractDispatch implements Dispatch {
     return handler;
   }
 
-  private <A extends Action<R>, R extends Result> SecureSessionValidator findSecureSessionValidator(
+  private <A extends Action<R>, R extends Result> SessionValidator findSecureSessionValidator(
       A action) throws UnsupportedActionException {
-    SecureSessionValidator secureSessionValidator = getSecureSessionValidatorRegistry()
+    SessionValidator secureSessionValidator = getSecureSessionValidatorRegistry()
         .findSecureSessionValidator(action);
 
     if (secureSessionValidator == null)
       throw new UnsupportedActionException(action);
 
     return secureSessionValidator;
-  }
-
-  @Override
-  public void setSessionId(String sessionId) {
-    this.sessionID = sessionId;
   }
 }

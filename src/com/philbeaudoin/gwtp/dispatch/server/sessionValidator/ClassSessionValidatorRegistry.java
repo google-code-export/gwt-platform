@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server;
+package com.philbeaudoin.gwtp.dispatch.server.sessionValidator;
 
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
- * Instances of this interface allow {@link SecureSessionValidator} classes to
+ * Instances of this interface allow {@link SessionValidator} classes to
  * be registered for specific {@link Action} types. This is typically to allow
  * lazy-loading of validators.
  * 
- * @see LazySecureSessionValidatorRegistry
+ * @see LazySessionValidatorRegistry
  * 
  * @author Christian Goudreau
  */
-public interface ClassSecureSessionValidatorRegistry extends SecureSessionValidatorRegistry {
+public interface ClassSessionValidatorRegistry extends SessionValidatorRegistry {
     /**
-     * Registers the specified {@link SecureSessionValidator} class with the
+     * Registers the specified {@link SessionValidator} class with the
      * registry.
      * 
      * @param <A>
@@ -40,9 +40,9 @@ public interface ClassSecureSessionValidatorRegistry extends SecureSessionValida
      * @param actionClass
      *            The {@link Action} class
      * @param secureSessionValidatorClass
-     *            The {@link SecureSessionValidator} class
+     *            The {@link SessionValidator} class
      */
-    public <A extends Action<R>, R extends Result> void addSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SecureSessionValidator> secureSessionValidatorClass);
+    public <A extends Action<R>, R extends Result> void addSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SessionValidator> secureSessionValidatorClass);
 
     /**
      * Removes any registration of specified class, as well as any instances
@@ -55,7 +55,7 @@ public interface ClassSecureSessionValidatorRegistry extends SecureSessionValida
      * @param actionClass
      *            The {@link Action} class
      * @param secureSessionValidatorClass
-     *            The {@link SecureSessionValidator} class
+     *            The {@link SessionValidator} class
      */
-    public <A extends Action<R>, R extends Result> void removeSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SecureSessionValidator> secureSessionValidatorClass);
+    public <A extends Action<R>, R extends Result> void removeSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SessionValidator> secureSessionValidatorClass);
 }

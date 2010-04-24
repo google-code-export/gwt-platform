@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server;
+package com.philbeaudoin.gwtp.dispatch.server.sessionValidator;
 
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
- * This is a subclass of {@link SecureSessionValidatorRegistry} wich allows
+ * This is a subclass of {@link SessionValidatorRegistry} wich allows
  * registration of validators by passing in the handler instance directly.
  * 
  * @author Christian Goudreau
  */
-public interface InstanceSecureSessionValidatorRegistry extends SecureSessionValidatorRegistry {
+public interface InstanceSessionValidatorRegistry extends SessionValidatorRegistry {
     /**
      * @param <A>
      *            Type of associated {@link Action}
@@ -34,9 +34,9 @@ public interface InstanceSecureSessionValidatorRegistry extends SecureSessionVal
      * @param action
      *            The {@link Action}
      * @param secureSessionValidator
-     *            The {@link SecureSessionValidator}
+     *            The {@link SessionValidator}
      */
-    public <A extends Action<R>, R extends Result> void addSecureSessionValidator(Class<A> actionClass, SecureSessionValidator secureSessionValidator);
+    public <A extends Action<R>, R extends Result> void addSecureSessionValidator(Class<A> actionClass, SessionValidator secureSessionValidator);
 
     /**
      * @param <A>

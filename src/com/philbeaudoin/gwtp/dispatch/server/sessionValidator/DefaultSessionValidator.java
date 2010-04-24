@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server;
+package com.philbeaudoin.gwtp.dispatch.server.sessionValidator;
 
 /**
- * The default {@link SecureSessionValidator} implementation.
+ * The default {@link SessionValidator} implementation.
  * It'll validate every action.
  * 
  * @author Christian Goudreau
  */
-public class DefaultSecureSessionValidator implements SecureSessionValidator {
+public class DefaultSessionValidator implements SessionValidator {
     @Override
     public boolean isValid(String sessionId) {
         return true;

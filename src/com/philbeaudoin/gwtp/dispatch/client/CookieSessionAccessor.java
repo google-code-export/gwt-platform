@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.client.secure;
+package com.philbeaudoin.gwtp.dispatch.client;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.Cookies;
 
-import com.philbeaudoin.gwtp.dispatch.shared.Action;
-import com.philbeaudoin.gwtp.dispatch.shared.Result;
+public class CookieSessionAccessor implements SessionAccessor {
+    private String cookieName;
 
-public interface SecureDispatchServiceAsync {
-    void execute( String sessionId, Action<?> action, AsyncCallback<Result> callback );
+    public CookieSessionAccessor( String cookieName ) {
+        this.cookieName = cookieName;
+    }
+
+    public boolean clearSessionId() {
+        if ( Cookies.getCookie( cookieName ) != null ) {
+            Cookies.removeCookie( cookieName );
+        }
+        return false;
+    }
+
+    public String getSessionId() {
+        return Cookies.getCookie( cookieName );
+    }
 }

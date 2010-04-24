@@ -17,7 +17,7 @@
 package com.philbeaudoin.gwtp.dispatch.client;
 
 /**
- * Implementations of this interface can be added to a {@link DispatchAsync} implementation
+ * Implementations of this interface can be added to a {@link DefaultDispatchAsync} implementation
  * to intercept exceptions which return from further up the chain.
  *
  * @author David Peterson

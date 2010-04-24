@@ -17,7 +17,7 @@
 package com.philbeaudoin.gwtp.dispatch.server;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchService;
+import com.philbeaudoin.gwtp.dispatch.client.DispatchService;
 import com.philbeaudoin.gwtp.dispatch.server.guice.GuiceDispatchServlet;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.ActionException;
@@ -32,13 +32,12 @@ import com.philbeaudoin.gwtp.dispatch.shared.ServiceException;
  * @author David Peterson
  * 
  */
-public abstract class AbstractDispatchServlet extends RemoteServiceServlet implements SecureDispatchService {
+public abstract class AbstractDispatchServlet extends RemoteServiceServlet implements DispatchService {
     private static final long serialVersionUID = -1995842556570759707L;
 
     public Result execute(String sessionId, Action<?> action) throws ActionException, ServiceException {
         try {
-            getDispatch().setSessionId(sessionId);
-            return getDispatch().execute(action);
+            return getDispatch().execute(sessionId, action);
         } catch (ActionException e) {
             log("Action exception while executing " + action.getClass().getName() + ": " + e.getMessage(), e);
             throw e;

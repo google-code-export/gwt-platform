@@ -19,8 +19,8 @@ package com.philbeaudoin.gwtp.dispatch.server.guice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.philbeaudoin.gwtp.dispatch.server.AbstractDispatch;
-import com.philbeaudoin.gwtp.dispatch.server.ActionHandlerRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidatorRegistry;
 
 /**
  * Base dispatch class used by Guice.
@@ -31,10 +31,10 @@ import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
 @Singleton
 public class GuiceDispatch extends AbstractDispatch {
     private final ActionHandlerRegistry handlerRegistry;
-    private final SecureSessionValidatorRegistry secureSessionValidatorRegistry;
+    private final SessionValidatorRegistry secureSessionValidatorRegistry;
 
     @Inject
-    public GuiceDispatch(ActionHandlerRegistry handlerRegistry, SecureSessionValidatorRegistry secureSessionValidatorRegistry) {
+    public GuiceDispatch(ActionHandlerRegistry handlerRegistry, SessionValidatorRegistry secureSessionValidatorRegistry) {
         this.handlerRegistry = handlerRegistry;
         this.secureSessionValidatorRegistry = secureSessionValidatorRegistry;
     }
@@ -45,7 +45,7 @@ public class GuiceDispatch extends AbstractDispatch {
     }
 
     @Override
-    protected SecureSessionValidatorRegistry getSecureSessionValidatorRegistry() {
+    protected SessionValidatorRegistry getSecureSessionValidatorRegistry() {
         return secureSessionValidatorRegistry;
     }
 }

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server;
+package com.philbeaudoin.gwtp.dispatch.server.actionHandler;
 
 import java.util.List;
 
+import com.philbeaudoin.gwtp.dispatch.server.ExecutionContext;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.ActionException;
 import com.philbeaudoin.gwtp.dispatch.shared.BatchAction;

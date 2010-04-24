@@ -19,21 +19,24 @@ package com.philbeaudoin.gwtp.dispatch.server.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.philbeaudoin.gwtp.dispatch.server.ActionHandlerRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.DefaultActionHandlerRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.DefaultSecureSessionValidatorRegistry;
 import com.philbeaudoin.gwtp.dispatch.server.Dispatch;
-import com.philbeaudoin.gwtp.dispatch.server.InstanceActionHandlerRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.InstanceSecureSessionValidatorRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandlerLinker;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.DefaultActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.InstanceActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.DefaultSessionValidatorRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.InstanceSessionValidatorRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidatorLinker;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidatorRegistry;
 
 /**
- * This module will configure the implementation for the {@link Dispatch} and
- * {@link ActionHandlerRegistry} interfaces. If you want to override the
- * defaults ({@link GuiceDispatch} and {@link DefaultActionHandlerRegistry},
- * respectively), pass the override values into the constructor for this module
- * and ensure it is installed <b>before</b> any {@link ActionHandlerModule}
- * instances.
+ * This module will configure the implementation for the {@link Dispatch},
+ * {@link ActionHandlerRegistry} interfaces and {@link SessionValidatorRegistry}
+ * interfaces. If you want to override the defaults ({@link GuiceDispatch},
+ * {@link DefaultActionHandlerRegistry} and
+ * {@link DefaultSessionValidatorRegistry}, respectively), pass the override
+ * values into the constructor for this module and ensure it is installed
+ * <b>before</b> any {@link DispatchModule}. instances.
  * 
  * @author Christian Goudreau
  * @author David Peterson
@@ -41,18 +44,18 @@ import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidatorRegistry;
 public class ServerDispatchModule extends AbstractModule {
     private Class<? extends Dispatch> dispatchClass;
     private Class<? extends ActionHandlerRegistry> actionHandlerRegistryClass;
-    private Class<? extends SecureSessionValidatorRegistry> secureSessionValidatorRegistryClass;
+    private Class<? extends SessionValidatorRegistry> secureSessionValidatorRegistryClass;
 
     public ServerDispatchModule() {
-        this(GuiceDispatch.class, DefaultActionHandlerRegistry.class, DefaultSecureSessionValidatorRegistry.class);
+        this(GuiceDispatch.class, DefaultActionHandlerRegistry.class, DefaultSessionValidatorRegistry.class);
     }
 
     public ServerDispatchModule(Class<? extends Dispatch> dispatchClass) {
-        this(dispatchClass, DefaultActionHandlerRegistry.class, DefaultSecureSessionValidatorRegistry.class);
+        this(dispatchClass, DefaultActionHandlerRegistry.class, DefaultSessionValidatorRegistry.class);
     }
 
     public ServerDispatchModule(Class<? extends Dispatch> dispatchClass, Class<? extends ActionHandlerRegistry> actionHandlerRegistryClass,
-            Class<? extends SecureSessionValidatorRegistry> secureSessionValidatorRegistryClass) {
+            Class<? extends SessionValidatorRegistry> secureSessionValidatorRegistryClass) {
         this.dispatchClass = dispatchClass;
         this.actionHandlerRegistryClass = actionHandlerRegistryClass;
         this.secureSessionValidatorRegistryClass = secureSessionValidatorRegistryClass;
@@ -61,7 +64,7 @@ public class ServerDispatchModule extends AbstractModule {
     @Override
     protected final void configure() {
         bind(ActionHandlerRegistry.class).to(getActionHandlerRegistryClass()).in(Singleton.class);
-        bind(SecureSessionValidatorRegistry.class).to(getSecureSessionValidatorRegistryClass()).in(Singleton.class);
+        bind(SessionValidatorRegistry.class).to(getSecureSessionValidatorRegistryClass()).in(Singleton.class);
         bind(Dispatch.class).to(getDispatchClass());
 
         // This will bind registered handlers to the registry.
@@ -69,8 +72,8 @@ public class ServerDispatchModule extends AbstractModule {
             requestStaticInjection(ActionHandlerLinker.class);
 
         // This will bind registered validators to the registry.
-        if (InstanceSecureSessionValidatorRegistry.class.isAssignableFrom(getSecureSessionValidatorRegistryClass()))
-            requestStaticInjection(SecureSessionValidatorLinker.class);
+        if (InstanceSessionValidatorRegistry.class.isAssignableFrom(getSecureSessionValidatorRegistryClass()))
+            requestStaticInjection(SessionValidatorLinker.class);
     }
 
     /**
@@ -96,7 +99,15 @@ public class ServerDispatchModule extends AbstractModule {
         return actionHandlerRegistryClass;
     }
 
-    protected Class<? extends SecureSessionValidatorRegistry> getSecureSessionValidatorRegistryClass() {
+    /**
+     * The class returned by this method is bound to the
+     * {@link SessionValidatorRegistry}. Subclasses may override this method to
+     * provide custom implementations. Defaults to
+     * {@link DefaultSessionValidatorRegistry}.
+     * 
+     * @return the {@link SessionValidatorRegistry} implementation class.
+     */
+    protected Class<? extends SessionValidatorRegistry> getSecureSessionValidatorRegistryClass() {
         return secureSessionValidatorRegistryClass;
     }
 

@@ -19,13 +19,13 @@ package com.philbeaudoin.gwtp.dispatch.server.guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.philbeaudoin.gwtp.dispatch.server.LazySecureSessionValidatorRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidator;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.LazySessionValidatorRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.sessionValidator.SessionValidator;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 
 /**
  * This will use Guice to create instances of registered
- * {@link SecureSessionValidator}s on in a lazy manner. There are only created
+ * {@link SessionValidator}s on in a lazy manner. There are only created
  * upon the first request of a validator for the {@link Action} it is registered
  * with, rather that requiring the class to be constructed when the registry is
  * initialized.
@@ -33,7 +33,7 @@ import com.philbeaudoin.gwtp.dispatch.shared.Action;
  * @author Christian Goudreau
  */
 @Singleton
-public class GuiceLazySecureSessionValidatorRegistry extends LazySecureSessionValidatorRegistry {
+public class GuiceLazySecureSessionValidatorRegistry extends LazySessionValidatorRegistry {
     private final Injector injector;
 
     @Inject
@@ -42,7 +42,7 @@ public class GuiceLazySecureSessionValidatorRegistry extends LazySecureSessionVa
     }
 
     @Override
-    protected SecureSessionValidator createInstance(Class<? extends SecureSessionValidator> validatorClass) {
+    protected SessionValidator createInstance(Class<? extends SessionValidator> validatorClass) {
         return injector.getInstance(validatorClass);
     }
 }
