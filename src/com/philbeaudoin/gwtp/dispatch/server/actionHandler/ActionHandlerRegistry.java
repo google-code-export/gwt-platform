@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.client.secure;
+package com.philbeaudoin.gwtp.dispatch.server.actionHandler;
 
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
-import com.philbeaudoin.gwtp.dispatch.shared.ActionException;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
-import com.philbeaudoin.gwtp.dispatch.shared.ServiceException;
 
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+public interface ActionHandlerRegistry {
 
-@RemoteServiceRelativePath("dispatch")
-public interface SecureDispatchService extends RemoteService {
-    Result execute( String sessionId, Action<?> action ) throws ActionException, ServiceException;
+    /**
+     * Searches the registry and returns the first handler which supports the
+     * specied action, or <code>null</code> if none is available.
+     * 
+     * @param action
+     *            The action.
+     * @return The handler.
+     */
+    public <A extends Action<R>, R extends Result> ActionHandler<A, R> findHandler(A action);
+
+    /**
+     * Clears all registered handlers from the registry.
+     */
+    public void clearHandlers();
 }

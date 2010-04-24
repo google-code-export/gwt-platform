@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server.guice;
+package com.philbeaudoin.gwtp.dispatch.server.actionHandler;
 
 import java.util.List;
 
@@ -22,10 +22,6 @@ import com.google.inject.Binding;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
-import com.philbeaudoin.gwtp.dispatch.server.ActionHandler;
-import com.philbeaudoin.gwtp.dispatch.server.ActionHandlerRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.ClassActionHandlerRegistry;
-import com.philbeaudoin.gwtp.dispatch.server.InstanceActionHandlerRegistry;
 
 /**
  * This class links any registered {@link ActionHandler} instances with the

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server;
+package com.philbeaudoin.gwtp.dispatch.server.sessionValidator;
 
 import java.util.Map;
 
@@ -23,29 +23,29 @@ import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
  * This is a lazy-loading implementation of the registry. It will only create
- * {@link SecureSessionValidator}s when they are first used. All
- * {@link SecureSessionValidator} implementations <b>must</b> have a public,
+ * {@link SessionValidator}s when they are first used. All
+ * {@link SessionValidator} implementations <b>must</b> have a public,
  * default constructor.
  * 
  * @author Christian Goudreau
  */
-public class LazySecureSessionValidatorRegistry implements ClassSecureSessionValidatorRegistry {
-    private final Map<Class<? extends Action<?>>, Class<? extends SecureSessionValidator>> validatorClasses;
-    private final Map<Class<? extends Action<?>>, SecureSessionValidator> validators;
+public class LazySessionValidatorRegistry implements ClassSessionValidatorRegistry {
+    private final Map<Class<? extends Action<?>>, Class<? extends SessionValidator>> validatorClasses;
+    private final Map<Class<? extends Action<?>>, SessionValidator> validators;
 
-    public LazySecureSessionValidatorRegistry() {
-        validatorClasses = new java.util.HashMap<Class<? extends Action<?>>, Class<? extends SecureSessionValidator>>(100);
-        validators = new java.util.HashMap<Class<? extends Action<?>>, SecureSessionValidator>(100);
+    public LazySessionValidatorRegistry() {
+        validatorClasses = new java.util.HashMap<Class<? extends Action<?>>, Class<? extends SessionValidator>>(100);
+        validators = new java.util.HashMap<Class<? extends Action<?>>, SessionValidator>(100);
     }
 
     @Override
-    public <A extends Action<R>, R extends Result> void addSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SecureSessionValidator> secureSessionValidatorClass) {
+    public <A extends Action<R>, R extends Result> void addSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SessionValidator> secureSessionValidatorClass) {
         validatorClasses.put(actionClass, secureSessionValidatorClass);
     }
 
     @Override
-    public <A extends Action<R>, R extends Result> void removeSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SecureSessionValidator> secureSessionValidatorClass) {
-        Class<? extends SecureSessionValidator> oldValidatorClass = validatorClasses.get(actionClass);
+    public <A extends Action<R>, R extends Result> void removeSecureSessionValidatorClass(Class<A> actionClass, Class<? extends SessionValidator> secureSessionValidatorClass) {
+        Class<? extends SessionValidator> oldValidatorClass = validatorClasses.get(actionClass);
 
         if (oldValidatorClass == secureSessionValidatorClass) {
             validatorClasses.remove(actionClass);
@@ -54,13 +54,13 @@ public class LazySecureSessionValidatorRegistry implements ClassSecureSessionVal
     }
 
     /**
-     * Will try to create and instance of {@link SecureSessionValidator}.
+     * Will try to create and instance of {@link SessionValidator}.
      * 
      * @param validatorClass
      *            The class to instantiate
      * @return The class instantiated
      */
-    protected SecureSessionValidator createInstance(Class<? extends SecureSessionValidator> validatorClass) {
+    protected SessionValidator createInstance(Class<? extends SessionValidator> validatorClass) {
         try {
             return validatorClass.newInstance();
         } catch (InstantiationException e) {
@@ -78,11 +78,11 @@ public class LazySecureSessionValidatorRegistry implements ClassSecureSessionVal
 
     @SuppressWarnings("unchecked")
     @Override
-    public <A extends Action<R>, R extends Result> SecureSessionValidator findSecureSessionValidator(A action) {
-        SecureSessionValidator validator = validators.get(action.getClass());
+    public <A extends Action<R>, R extends Result> SessionValidator findSecureSessionValidator(A action) {
+        SessionValidator validator = validators.get(action.getClass());
 
         if (validator == null) {
-            Class<? extends SecureSessionValidator> validatorClass = validatorClasses.get(action.getClass());
+            Class<? extends SessionValidator> validatorClass = validatorClasses.get(action.getClass());
             if (validatorClass != null) {
                 validator = createInstance(validatorClass);
             }

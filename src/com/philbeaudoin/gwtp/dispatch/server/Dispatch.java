@@ -47,6 +47,25 @@ public interface Dispatch {
     <A extends Action<R>, R extends Result> R execute(A action) throws ActionException, ServiceException;
 
     /**
+     * Executes the specified action and returns the appropriate result.
+     * 
+     * @param <A>
+     *            The {@link Action} type.
+     * @param <R>
+     *            The {@link Result} type.
+     * @param sessionId
+     *            The client unique sessionId
+     * @param action
+     *            The {@link Action}.
+     * @return The action's result.
+     * @throws ActionException
+     *             if the action execution failed.
+     * @throws ServiceException
+     *             if the execution failed due to a service error.
+     */
+    <A extends Action<R>, R extends Result> R execute(String sessionId, A action) throws ActionException, ServiceException;    
+    
+    /**
      * Undoes a previously executed action.
      * 
      * @param <A>
@@ -61,13 +80,26 @@ public interface Dispatch {
      *             if undoing the action failed.
      * @throws ServiceException
      *             if the execution failed due to a service error.
-     */
+     */   
     <A extends Action<R>, R extends Result> void undo(A action, R result) throws ActionException, ServiceException;
-
+    
     /**
-     * Add the sessionId to use with the {@link SecureSessionValidator}
+     * Undoes a previously executed action.
      * 
-     * @param sessionId The sessionId
+     * @param <A>
+     *            The {@link Action} type.
+     * @param <R>
+     *            The {@link Result} type.
+     * @param sessionId
+     *            The client unique sessionId
+     * @param action
+     *            The {@link Action} to undo.
+     * @param result
+     *            The result obtained when the action was previously executed.
+     * @throws ActionException
+     *             if undoing the action failed.
+     * @throws ServiceException
+     *             if the execution failed due to a service error.
      */
-    void setSessionId(String sessionId);
+    <A extends Action<R>, R extends Result> void undo(String sessionId, A action, R result) throws ActionException, ServiceException;
 }

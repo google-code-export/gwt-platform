@@ -19,15 +19,15 @@ package com.philbeaudoin.gwtp.dispatch.client.gin;
 import com.google.gwt.inject.client.Ginjector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.philbeaudoin.gwtp.dispatch.client.CookieSessionAccessor;
 import com.philbeaudoin.gwtp.dispatch.client.DefaultExceptionHandler;
+import com.philbeaudoin.gwtp.dispatch.client.DefaultDispatchAsync;
 import com.philbeaudoin.gwtp.dispatch.client.DispatchAsync;
 import com.philbeaudoin.gwtp.dispatch.client.ExceptionHandler;
-import com.philbeaudoin.gwtp.dispatch.client.secure.CookieSecureSessionAccessor;
-import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchAsync;
-import com.philbeaudoin.gwtp.dispatch.client.secure.SecureSessionAccessor;
+import com.philbeaudoin.gwtp.dispatch.client.SessionAccessor;
 
 /**
- * This module binds the {@link DispatchAsync} to {@link SecureDispatchAsync}.
+ * This module binds the {@link DefaultDispatchAsync} to {@link DispatchAsync}.
  * For simple cases, just set this as a \@GinModule in your {@link Ginjector} instance.
  * <p/>
  * If you want to provide a custom {@link ExceptionHandler} just call
@@ -35,35 +35,35 @@ import com.philbeaudoin.gwtp.dispatch.client.secure.SecureSessionAccessor;
  * in another module.
  * <p/>
  * You must also provide another module which binds an implementation of
- * {@link SecureSessionAccessor}, such as {@link CookieSecureSessionAccessor}
+ * {@link SessionAccessor}, such as {@link CookieSessionAccessor}
  * or {@link AppEngineSecureSessionAccessor}.
  *
  * @author David Peterson
  */
-public class SecureDispatchModule extends AbstractDispatchModule {
+public class DefaultDispatchModule extends AbstractDispatchModule {
 
     /**
-     * Constructs a new GIN configuration module that sets up a secure {@link com.philbeaudoin.gwtp.dispatch.client.DispatchAsync}
+     * Constructs a new GIN configuration module that sets up a secure {@link com.philbeaudoin.gwtp.dispatch.client.DefaultDispatchAsync}
      * implementation, using the {@link com.philbeaudoin.gwtp.dispatch.client.DefaultExceptionHandler}.
      */
-    public SecureDispatchModule() {
+    public DefaultDispatchModule() {
         this( DefaultExceptionHandler.class );
     }
 
     /**
-     * Constructs a new GIN configuration module that sets up a secure {@link com.philbeaudoin.gwtp.dispatch.client.DispatchAsync}
+     * Constructs a new GIN configuration module that sets up a secure {@link com.philbeaudoin.gwtp.dispatch.client.DefaultDispatchAsync}
      * implementation, using the provided {@link ExceptionHandler} implementation class.
      *
      * @param exceptionHandlerType The {@link ExceptionHandler} implementation class.
      */
-    public SecureDispatchModule( Class<? extends ExceptionHandler> exceptionHandlerType ) {
+    public DefaultDispatchModule( Class<? extends ExceptionHandler> exceptionHandlerType ) {
         super( exceptionHandlerType );
     }
 
     @Provides
     @Singleton
-    protected DispatchAsync provideDispatchAsync( ExceptionHandler exceptionHandler, SecureSessionAccessor secureSessionAccessor ) {
-        return new SecureDispatchAsync( exceptionHandler, secureSessionAccessor );
+    protected DefaultDispatchAsync provideDispatchAsync( ExceptionHandler exceptionHandler, SessionAccessor secureSessionAccessor ) {
+        return new DispatchAsync( exceptionHandler, secureSessionAccessor );
     }
 
 }

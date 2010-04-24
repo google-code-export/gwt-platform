@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server;
+package com.philbeaudoin.gwtp.dispatch.server.sessionValidator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,19 +23,19 @@ import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
- * The default {@link InstanceSecureSessionValidatorRegistry} implementation.
+ * The default {@link InstanceSessionValidatorRegistry} implementation.
  * 
  * @author Christian Goudreau
  */
-public class DefaultSecureSessionValidatorRegistry implements InstanceSecureSessionValidatorRegistry {
-    private final Map<Class<? extends Action<? extends Result>>, SecureSessionValidator> validators;
+public class DefaultSessionValidatorRegistry implements InstanceSessionValidatorRegistry {
+    private final Map<Class<? extends Action<? extends Result>>, SessionValidator> validators;
 
-    public DefaultSecureSessionValidatorRegistry() {
-        validators = new HashMap<Class<? extends Action<? extends Result>>, SecureSessionValidator>(100);
+    public DefaultSessionValidatorRegistry() {
+        validators = new HashMap<Class<? extends Action<? extends Result>>, SessionValidator>(100);
     }
 
     @Override
-    public <A extends Action<R>, R extends Result> void addSecureSessionValidator(Class<A> actionClass, SecureSessionValidator secureSessionValidator) {
+    public <A extends Action<R>, R extends Result> void addSecureSessionValidator(Class<A> actionClass, SessionValidator secureSessionValidator) {
         validators.put(actionClass, secureSessionValidator);
     }
 
@@ -50,7 +50,7 @@ public class DefaultSecureSessionValidatorRegistry implements InstanceSecureSess
     }
 
     @Override
-    public <A extends Action<R>, R extends Result> SecureSessionValidator findSecureSessionValidator(A action) {
+    public <A extends Action<R>, R extends Result> SessionValidator findSecureSessionValidator(A action) {
         return validators.get(action.getClass());
     }
 

@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.client.secure;
+package com.philbeaudoin.gwtp.dispatch.server.actionHandler;
 
-/**
- * Provides access to the session ID.
- * 
- * @author David Peterson
- */
-public interface SecureSessionAccessor {
-    /**
-     * Gets the current session ID.
-     * 
-     * @return The ID.
-     */
-    String getSessionId();
+import com.philbeaudoin.gwtp.dispatch.shared.Action;
+import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
-    /**
-     * Clears the session id, effectively closing the current session.
-     * 
-     * @return <code>true</code> if successful.
-     */
-    boolean clearSessionId();
+public interface ActionHandlerMap<A extends Action<R>, R extends Result> {
+    public Class<A> getActionClass();
+
+    public Class<? extends ActionHandler<A, R>> getActionHandlerClass();
 }

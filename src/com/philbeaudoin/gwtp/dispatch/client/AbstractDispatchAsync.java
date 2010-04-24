@@ -19,8 +19,6 @@ package com.philbeaudoin.gwtp.dispatch.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchService;
-import com.philbeaudoin.gwtp.dispatch.client.secure.SecureDispatchServiceAsync;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
@@ -34,13 +32,14 @@ import com.philbeaudoin.gwtp.dispatch.shared.Result;
  * @author David Peterson
  * @author Christian Goudreau
  */
-public abstract class AbstractDispatchAsync implements DispatchAsync {
-    private static final SecureDispatchServiceAsync realService = GWT.create(SecureDispatchService.class);
-    private static final String baseUrl = ((ServiceDefTarget) realService).getServiceEntryPoint() + "/";
+public abstract class AbstractDispatchAsync implements DefaultDispatchAsync {
+    private static final DispatchServiceAsync realService = GWT.create(DispatchService.class);
+    private final String baseUrl; 
 
     private final ExceptionHandler exceptionHandler;
 
     public AbstractDispatchAsync(ExceptionHandler exceptionHandler) {
+        this.baseUrl = ((ServiceDefTarget) realService).getServiceEntryPoint() + "/";
         this.exceptionHandler = exceptionHandler;
     }
 
@@ -57,11 +56,7 @@ public abstract class AbstractDispatchAsync implements DispatchAsync {
     }
 
     protected <A extends Action<R>, R extends Result> void execute(String sessionId, Action<?> action, AsyncCallback<Result> callback) {
-        String className = action.getClass().getName();
-        int namePos = className.lastIndexOf(".") + 1;
-        className = className.substring(namePos);
-
-        ((ServiceDefTarget) realService).setServiceEntryPoint(baseUrl + className);
+        ((ServiceDefTarget) realService).setServiceEntryPoint(baseUrl + action.getServiceName());
 
         realService.execute(sessionId, action, callback);
     }

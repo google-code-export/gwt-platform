@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.dispatch.server.guice;
+package com.philbeaudoin.gwtp.dispatch.server.sessionValidator;
 
-import com.philbeaudoin.gwtp.dispatch.server.SecureSessionValidator;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 import com.philbeaudoin.gwtp.dispatch.shared.Result;
 
 /**
- * This is the interface that define the map of {@link SecureSessionValidator}.
+ * This is the interface that define the map of {@link SessionValidator}.
  * 
  * @param <A>
  *            Type of the associated {@link Action}
@@ -30,14 +29,14 @@ import com.philbeaudoin.gwtp.dispatch.shared.Result;
  * 
  * @author Christian Goudreau
  */
-public interface SecureSessionValidatorMap<A extends Action<R>, R extends Result> {
+public interface SessionValidatorMap<A extends Action<R>, R extends Result> {
     /**
      * @return the {@link Action} class associated
      */
     public Class<A> getActionClass();
 
     /**
-     * @return the {@link SecureSessionValidator} class associated
+     * @return the {@link SessionValidator} class associated
      */
-    public Class<? extends SecureSessionValidator> getSecureSessionValidatorClass();
+    public Class<? extends SessionValidator> getSecureSessionValidatorClass();
 }

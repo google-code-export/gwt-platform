@@ -20,8 +20,8 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
-import com.philbeaudoin.gwtp.dispatch.server.ActionHandler;
-import com.philbeaudoin.gwtp.dispatch.server.LazyActionHandlerRegistry;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.ActionHandler;
+import com.philbeaudoin.gwtp.dispatch.server.actionHandler.LazyActionHandlerRegistry;
 import com.philbeaudoin.gwtp.dispatch.shared.Action;
 
 /**
