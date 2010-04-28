@@ -162,8 +162,13 @@ public abstract class AbstractDispatch implements Dispatch {
         throw new ActionException("Insufficient rights");
     } catch (ActionException e) {
       throw e;
-    } catch (Exception e) {
-      throw new ServiceException(e);
+    } catch( Exception e ) {
+      String newMessage = "Service exception executing action \"" + action.getClass().getSimpleName() + "\"";
+      if( e.getMessage() != null )
+        newMessage += ": " + e.getMessage();
+      ServiceException rethrown = new ServiceException( newMessage ); 
+      rethrown.initCause(e);
+      throw rethrown;
     }
   }
 
