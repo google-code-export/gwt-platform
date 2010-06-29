@@ -1,4 +1,4 @@
-package com.philbeaudoin.gwtp.mvp.client.gin;
+package com.philbeaudoin.gwtp.mvp.gin;
 
 import com.philbeaudoin.gwtp.mvp.client.PresenterImpl;
 import com.philbeaudoin.gwtp.mvp.client.proxy.Proxy;
