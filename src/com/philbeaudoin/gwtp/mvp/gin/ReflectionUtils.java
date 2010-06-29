@@ -1,4 +1,4 @@
-package com.philbeaudoin.gwtp.mvp.client.gin;
+package com.philbeaudoin.gwtp.mvp.gin;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
