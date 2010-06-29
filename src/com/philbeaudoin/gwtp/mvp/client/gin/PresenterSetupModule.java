@@ -51,7 +51,8 @@ public final class PresenterSetupModule extends AbstractGinModule {
   public boolean equals( Object object ) {
     return object instanceof PresenterSetupModule;
   }
-
+  
+  @Override
   public int hashCode() {
     return 19;
   }
