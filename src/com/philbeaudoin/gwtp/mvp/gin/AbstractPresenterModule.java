@@ -51,7 +51,7 @@ public abstract class AbstractPresenterModule extends AbstractGinModule {
       Class<P> presenter, Class<V> viewImpl) {
     Type[] args = ReflectionUtils.getTypeArguments(PresenterWidgetImpl.class,
         presenter);
-    bindPresenterWidget(presenter, (Class<View>) args[1], viewImpl);
+    bindPresenterWidget(presenter, (Class<View>) args[0], viewImpl);
   }
 
   /**
