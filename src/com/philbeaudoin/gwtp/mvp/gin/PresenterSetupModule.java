@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philbeaudoin.gwtp.mvp.client.gin;
+package com.philbeaudoin.gwtp.mvp.gin;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.philbeaudoin.gwtp.mvp.client.proxy.ParameterTokenFormatter;
