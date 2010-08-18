@@ -22,7 +22,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.RequestTabsEvent;
-import com.gwtplatform.mvp.client.RequestTabsHandler;
+import com.gwtplatform.mvp.client.RequestTabsHandlerGeneric;
 import com.gwtplatform.mvp.client.Tab;
 
 /**
@@ -30,52 +30,36 @@ import com.gwtplatform.mvp.client.Tab;
  * 
  * @author Philippe Beaudoin
  */
-public class TabContentProxyImpl<P extends Presenter> extends ProxyImpl<P>
-    implements TabContentProxy<P> {
+public class TabContentProxyImpl<T extends TabDescription, P extends Presenter> 
+    extends ProxyImpl<P> implements TabContentProxyGeneric<T, P> {
 
-  protected String historyToken;
-  protected String label;
-  protected float priority;
-  protected Type<RequestTabsHandler> requestTabsEventType;
-
+  protected Type<? extends RequestTabsHandlerGeneric<T>> requestTabsEventType;
+  protected T tabDescription = null;
   private Tab tab = null;
 
   /**
-   * Creates a {@link Proxy} for a {@link Presenter} that is meant to be
-   * contained within at {@link TabContainerPresenter}. As such, these proxy
-   * hold a string that can be displayed on the tab.
+   * Creates a {@link Proxy} for a {@link Presenter} that 
+   * is meant to be contained within at {@link TabContainerPresenter}.
+   * As such, these proxy hold a string that can be displayed on the 
+   * tab. 
    */
   public TabContentProxyImpl() {
   }
 
   @Override
-  public String getHistoryToken() {
-    return historyToken;
+  public T getTabDescription() {
+    return tabDescription;
   }
-
-  @Override
-  public String getLabel() {
-    return label;
-  }
-
-  @Override
-  public float getPriority() {
-    return priority;
-  }
-
-  @Override
-  public Tab getTab() {
-    return tab;
-  }
-
+  
+  @SuppressWarnings("unchecked")
   @Inject
-  protected void bind(EventBus eventBus) {
-    eventBus.addHandler(requestTabsEventType, new RequestTabsHandler() {
+  protected void bind( EventBus eventBus ) {
+    eventBus.addHandler((Type<RequestTabsHandlerGeneric<T>>)requestTabsEventType, new RequestTabsHandlerGeneric<T>(){
       @Override
-      public void onRequestTabs(RequestTabsEvent event) {
-        tab = event.getTabContainer().addTab(TabContentProxyImpl.this);
+      public void onRequestTabs(RequestTabsEvent<T> event) {
+        tab = event.getTabContainer().addTab( getTabDescription() );
       }
-    });
-  }
+    } );
+  }   
 
 }

@@ -16,11 +16,14 @@
 
 package com.gwtplatform.mvp.client;
 
+import com.gwtplatform.mvp.client.proxy.TabDescriptionText;
+
 /**
- * The interface of a {@link View} that is also a {@link TabPanel}.
+ * The interface of a {@link View} that is also a {@link TabPanel}. 
+ * This interface assumes the use of a {@link TabDescriptionText}. 
+ * For more flexibility, implement directly {@link TabViewGeneric}.
  * 
  * @author Philippe Beaudoin
  */
-public interface TabView extends View, TabPanel {
-
+public interface TabView extends TabViewGeneric<TabDescriptionText> {
 }

@@ -13,51 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
+ 
 package com.gwtplatform.mvp.client.proxy;
 
 import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.Tab;
 
 /**
- * @param <P> {@link Presenter}'s type.
+ * Proxy for presenters that are associated with a tab. If the presenter 
+ * is also associated with a place, use {@link TabContentProxyPlace}.
+ * This interface assumes the use of a {@link TabDescriptionText}. 
+ * For more flexibility, implement directly {@link TabContentProxyGeneric}.
  * 
  * @author Philippe Beaudoin
+ *
+ * @param <P> The type of the {@link Presenter} attached to this {@link TabContentProxyPlace}.
  */
-public interface TabContentProxy<P extends Presenter> extends Proxy<P> {
-
-  /**
-   * Retrieves the history token to show when this tab is displayed. In the
-   * fairly typical scenario where a tab directly contains a {@link ProxyPlace},
-   * this should return the name token of the proxy place. In the case of tabs
-   * that contain other tab presenters, this should return the name token of a
-   * leaf-level proxy.
-   * 
-   * @return The default history token to show.
-   */
-  String getHistoryToken();
-
-  /**
-   * Retrieves the text label to show on that tab.
-   * 
-   * @return The text label.
-   */
-  String getLabel();
-
-  /**
-   * A tab priority indicates where it should appear within the tab strip. A tab
-   * with low priority will be placed more towards the left of the strip. Two
-   * tabs with the same priority will be placed in an arbitrary order.
-   * 
-   * @return The priority.
-   */
-  float getPriority();
-
-  /**
-   * Retrieves the tab object associated with this presenter.
-   * 
-   * @return The tab object.
-   */
-  Tab getTab();
-
+public interface TabContentProxy<P extends Presenter> 
+extends TabContentProxyGeneric<TabDescriptionText, P> {
 }

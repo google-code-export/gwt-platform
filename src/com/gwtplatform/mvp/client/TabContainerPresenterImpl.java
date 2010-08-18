@@ -22,8 +22,11 @@ import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.TabContentProxy;
 
 /**
- * A presenter that can display many tabs and the content of one of these tabs.
- * 
+ * A presenter that can display many tabs identified by a label 
+ * and the content of one of these tabs. This implementation assumes
+ * the use of a {@link TabDescriptionText}. For more flexibility,
+ * inherit directly from {@link TabContainerPresenterImpl}.
+ *
  * @param <V> The specific type of the {@link View}. Must implement
  *          {@link TabPanel}.
  * @param <Proxy_> The specific type of the proxy, must be a
@@ -32,11 +35,9 @@ import com.gwtplatform.mvp.client.proxy.TabContentProxy;
  * @author Philippe Beaudoin
  * @author Christian Goudreau
  */
-public abstract class TabContainerPresenterImpl<V extends View & TabPanel, Proxy_ extends Proxy<?>>
-    extends PresenterImpl<V, Proxy_> implements TabContainerPresenter {
+public abstract class TabContainerPresenterImpl<V extends TabView, Proxy_ extends Proxy<?>>
+    extends TabContainerPresenterGeneric<TabDescriptionText,V,Proxy_> {
 
-  private final Type<RequestTabsHandler> requestTabsEventType;
-  private final Object tabContentSlot;
 
   /**
    * Create a presenter that can display many tabs and the content of one of
@@ -53,42 +54,7 @@ public abstract class TabContainerPresenterImpl<V extends View & TabPanel, Proxy
   public TabContainerPresenterImpl(final EventBus eventBus, final V view,
       final Proxy_ proxy, final Object tabContentSlot,
       final Type<RequestTabsHandler> requestTabsEventType) {
-    super(eventBus, view, proxy);
-    this.tabContentSlot = tabContentSlot;
-    this.requestTabsEventType = requestTabsEventType;
-  }
-
-  @Override
-  public Tab addTab(final TabContentProxy<?> tabProxy) {
-    return getView().addTab(tabProxy.getLabel(), tabProxy.getHistoryToken(),
-        tabProxy.getPriority());
-  }
-
-  @Override
-  public void setContent(Object slot, PresenterWidget content) {
-    super.setContent(slot, content);
-    if (slot == tabContentSlot) {
-      Tab tab = ((TabContentProxy<?>) ((Presenter) content).getProxy()).getTab();
-      getView().setActiveTab(tab);
-    }
-  }
-
-  @Override
-  protected void onBind() {
-    super.onBind();
-
-    // The following call will trigger a series of call to addTab, so
-    // we should make sure we clear all the tabs when unbinding.
-    RequestTabsEvent.fire(this, requestTabsEventType, this);
-  }
-
-  @Override
-  protected void onUnbind() {
-    super.onUnbind();
-
-    // The tabs are added indirectly in onBind() via the RequestTabsEvent, so we
-    // clear them now.
-    getView().removeTabs();
+    super(eventBus, view, proxy, tabContentSlot, requestTabsEventType);
   }
 
 }

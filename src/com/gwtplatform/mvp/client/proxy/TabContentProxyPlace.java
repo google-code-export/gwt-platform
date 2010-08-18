@@ -20,6 +20,8 @@ import com.gwtplatform.mvp.client.Presenter;
 
 /**
  * The interface of a {@link TabContentProxy} that is also a {@link Place}.
+ * This interface assumes the use of a {@link TabDescriptionText}. 
+ * For more flexibility, implement directly {@link TabContentProxyPlaceGeneric}.
  * 
  * @author Philippe Beaudoin
  * 
@@ -27,5 +29,5 @@ import com.gwtplatform.mvp.client.Presenter;
  *          {@link TabContentProxy}.
  */
 public interface TabContentProxyPlace<P extends Presenter> extends
-    TabContentProxy<P>, Place {
+    extends TabContentProxyPlaceGeneric<TabDescriptionText, P> {
 }

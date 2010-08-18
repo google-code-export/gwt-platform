@@ -21,15 +21,16 @@ import com.gwtplatform.mvp.client.proxy.TabContentProxy;
 /**
  * @author Philippe Beaudoin
  */
-public interface TabContainerPresenter extends Presenter {
+public interface TabContainerPresenter<T extends TabDescription> extends Presenter {
 
   /**
    * Adds a new tab to this presenter.
    * 
-   * @param tabProxy The {@link TabContentProxy} containing information on the
-   *          tab to add.
+   * @param tabDescription The {@link TabDescription} containing 
+   *          information on the tab to add.
+   *
    * @return The newly added tab.
    */
-  Tab addTab(TabContentProxy<?> tabProxy);
+  Tab addTab(T tabProxy);
 
 }
