@@ -20,33 +20,24 @@ import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.Tab;
 
 /**
- * A useful mixing class to define a {@link TabContentProxy} that is also a
- * {@link Place}.
+ * A useful mixing class to define a {@link TabContentProxyGeneric} that is also
+ * a {@link Place}.
  * 
+ * @param <T> {@link TabDescription}'s type.
  * @param <P> {@link Presenter}'s type.
  * 
  * @author Philippe Beaudoin
  */
-public class TabContentProxyPlaceImpl<P extends Presenter> extends
-    ProxyPlaceAbstract<P, TabContentProxy<P>> implements
-    TabContentProxyPlace<P> {
+public class TabContentProxyPlaceImpl<T extends TabDescription, P extends Presenter> 
+    extends ProxyPlaceAbstract<P, TabContentProxyGeneric<T, P>> implements
+    TabContentProxyPlaceGeneric<T, P> {
 
   public TabContentProxyPlaceImpl() {
   }
-
+  
   @Override
-  public String getHistoryToken() {
-    return getNameToken();
-  }
-
-  @Override
-  public String getLabel() {
-    return proxy.getLabel();
-  }
-
-  @Override
-  public float getPriority() {
-    return proxy.getPriority();
+  public T getTabDescription() {
+    return proxy.getTabDescription();
   }
 
   @Override

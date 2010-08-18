@@ -21,6 +21,8 @@ import com.gwtplatform.mvp.client.TabContainerPresenter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
+import com.gwtplatform.mvp.client.proxy.TabDescriptionText;
+import com.gwtplatform.mvp.rebind.TabDescriptionTextGenerator;
 /**
  * Annotation used to specify the priority and name to display on a tab. Specify
  * either {@link #label} or {@link #getLabel}. The latter let you specify the
@@ -37,12 +39,17 @@ import java.lang.annotation.Target;
  *    priority = 12,
  *    getLabel = "ginjector.getTranslations().tabDetailsLabel()" )
  * </pre>
+ * This annotation creates tabs using the {@link TabDescriptionText} class.
+ * If you want to generate tabs following your custom tab description class,
+ * implement your own {@code @TabInfo}-like annotation and make sure you
+ * annotate it with {@link TabInfoGenerator}, passing in your own generator.
  * 
  * @author Philippe Beaudoin
  */
 @Target(ElementType.TYPE)
+@TabInfoGenerator(TabDescriptionTextGenerator.class)
 public @interface TabInfo {
-  Class<? extends TabContainerPresenter> container();
+  Class<? extends TabContainerPresenter<?>> container();
 
   String getLabel() default "";
 

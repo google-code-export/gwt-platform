@@ -16,22 +16,21 @@
 
 package com.gwtplatform.mvp.client;
 
+import com.gwtplatform.mvp.client.proxy.TabDescription;
+
 /**
  * @author Philippe Beaudoin
  */
-public interface TabPanel {
+public interface TabPanel<T extends TabDescription> {
 
   /**
    * Adds a new tab to the widget.
    * 
-   * @param text The text to display on the tab.
-   * @param historyToken The history token the tab points to.
-   * @param priority The priority of the {@link Tab} to add, implementations of
-   *          this interface should ensure that lower priority tabs are
+   * @param description The {@link TabDescription} structure that contains information about this tab.
    *          displayed before higher priority ones.
    * @return The newly added {@link Tab}.
    */
-  Tab addTab(String text, String historyToken, float priority);
+  public Tab addTab( T description );
 
   /**
    * Removes a tab from the widget.
