@@ -14,17 +14,33 @@
  * the License.
  */
 
-package com.gwtplatform.mvp.client.proxy;
+package com.gwtplatform.externaltest;
 
-import com.gwtplatform.mvp.client.Presenter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+import com.gwtplatform.mvp.client.EventBus;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
- * The interface of a {@link TabContentProxy} that is also a {@link Place}.
- * 
- * @param <T> The Presenter's type.
+ * This is the test presenter.
  * 
  * @author Philippe Beaudoin
  */
-public interface TabContentProxyPlace<T extends Presenter<?, ?>> extends
-    TabContentProxy<T>, Place {
+@Singleton
+public class SubPresenterWidget extends PresenterWidget<SubPresenterWidget.MyView> {
+  
+  /**
+   * Presenter's view.
+   */
+  public interface MyView extends View {    
+  }  
+  
+  @Inject
+  public SubPresenterWidget(final EventBus eventBus, final MyView view) {
+    super(eventBus, view);
+  }
+
 }
+

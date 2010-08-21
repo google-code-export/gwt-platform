@@ -102,10 +102,10 @@ public class PresenterWidgetImplTest {
   }
   // Simple subclasses of PresenterWidgetImpl
   abstract static class PresenterWidgetSpy<V extends View> extends
-      PresenterWidgetImpl<V> {
-    public int onHideMethodCalled = 0;
-    public int onResetMethodCalled = 0;
-    public int onRevealMethodCalled = 0;
+      PresenterWidget<V> {
+    public int onHideMethodCalled;
+    public int onResetMethodCalled;
+    public int onRevealMethodCalled;
 
     PresenterWidgetSpy(EventBus eventBus, V view) {
       super(eventBus, view);
@@ -324,8 +324,8 @@ public class PresenterWidgetImplTest {
     presenterWidgetA.notifyReveal();
 
     // When
-    presenterWidgetA.addContent(slotBC, contentB);
-    presenterWidgetA.addContent(slotBC, contentC);
+    presenterWidgetA.addInSlot(slotBC, contentB);
+    presenterWidgetA.addInSlot(slotBC, contentC);
 
     // Then
     verify(viewAProvider.get()).addContent(slotBC, widgetB);
@@ -335,7 +335,7 @@ public class PresenterWidgetImplTest {
     assertEquals(1, contentC.onRevealMethodCalled);
 
     // and then When
-    presenterWidgetA.clearContent(slotBC);
+    presenterWidgetA.clearSlot(slotBC);
 
     // Then
     verify(viewAProvider.get()).setContent(slotBC, null);
@@ -403,10 +403,10 @@ public class PresenterWidgetImplTest {
 
     // Given
     presenterWidgetA.notifyReveal();
-    presenterWidgetA.setContent(slotB, contentB);
+    presenterWidgetA.setInSlot(slotB, contentB);
 
     // When
-    presenterWidgetA.clearContent(slotB);
+    presenterWidgetA.clearSlot(slotB);
 
     // Then
     verify(viewAProvider.get()).setContent(slotB, null);
@@ -430,11 +430,11 @@ public class PresenterWidgetImplTest {
 
     // Given
     presenterWidgetA.notifyReveal();
-    presenterWidgetA.addContent(slotBC, contentB);
-    presenterWidgetA.addContent(slotBC, contentC);
+    presenterWidgetA.addInSlot(slotBC, contentB);
+    presenterWidgetA.addInSlot(slotBC, contentC);
 
     // When
-    presenterWidgetA.removeContent(slotBC, contentB);
+    presenterWidgetA.removeFromSlot(slotBC, contentB);
 
     // Then
     verify(viewAProvider.get()).removeContent(slotBC, widgetB);
@@ -444,7 +444,7 @@ public class PresenterWidgetImplTest {
   }
 
   @Test
-  public void testSetContentHierarchyInEmptySlotOnInitiallyInvisiblePresenter1() {
+  public void testsetInSlotHierarchyInEmptySlotOnInitiallyInvisiblePresenter1() {
     // Set-up
     PresenterWidgetA presenterWidgetA = presenterWidgetAProvider.get();
     Object slotB = new Object();
@@ -458,8 +458,8 @@ public class PresenterWidgetImplTest {
     assertFalse(contentB.isVisible());
 
     // When
-    presenterWidgetA.setContent(slotB, contentB);
-    contentB.setContent(slotC, contentCinB);
+    presenterWidgetA.setInSlot(slotB, contentB);
+    contentB.setInSlot(slotC, contentCinB);
 
     // Then
     verify(viewAProvider.get()).setContent(slotB, widgetB);
@@ -486,7 +486,7 @@ public class PresenterWidgetImplTest {
   }
 
   @Test
-  public void testSetContentHierarchyInEmptySlotOnInitiallyInvisiblePresenter2() {
+  public void testsetInSlotHierarchyInEmptySlotOnInitiallyInvisiblePresenter2() {
     // Set-up
     PresenterWidgetA presenterWidgetA = presenterWidgetAProvider.get();
     Object slotB = new Object();
@@ -500,14 +500,14 @@ public class PresenterWidgetImplTest {
     assertFalse(contentB.isVisible());
 
     // When
-    contentB.setContent(slotC, contentCinB);
+    contentB.setInSlot(slotC, contentCinB);
 
     // Then
     verify(viewBProvider.get()).setContent(slotC, widgetC);
     assertEquals(0, contentCinB.onRevealMethodCalled);
 
     // and then When
-    presenterWidgetA.setContent(slotB, contentB);
+    presenterWidgetA.setInSlot(slotB, contentB);
 
     // Then
     verify(viewAProvider.get()).setContent(slotB, widgetB);
@@ -531,7 +531,7 @@ public class PresenterWidgetImplTest {
   }
 
   @Test
-  public void testSetContentHierarchyInEmptySlotOnInitiallyVisiblePresenter() {
+  public void testsetInSlotHierarchyInEmptySlotOnInitiallyVisiblePresenter() {
     // Set-up
     PresenterWidgetA presenterWidgetA = presenterWidgetAProvider.get();
     Object slotB = new Object();
@@ -543,8 +543,8 @@ public class PresenterWidgetImplTest {
     presenterWidgetA.notifyReveal();
 
     // When
-    presenterWidgetA.setContent(slotB, contentB);
-    contentB.setContent(slotC, contentCinB);
+    presenterWidgetA.setInSlot(slotB, contentB);
+    contentB.setInSlot(slotC, contentCinB);
 
     // Then
     verify(viewAProvider.get()).setContent(slotB, widgetB);
@@ -565,7 +565,7 @@ public class PresenterWidgetImplTest {
   }
 
   @Test
-  public void testSetContentInEmptySlotOnInitiallyInvisiblePresenter() {
+  public void testsetInSlotInEmptySlotOnInitiallyInvisiblePresenter() {
     // Set-up
     PresenterWidgetA presenterWidgetA = presenterWidgetAProvider.get();
     Object slotB = new Object();
@@ -578,8 +578,8 @@ public class PresenterWidgetImplTest {
     assertFalse(presenterWidgetA.isVisible());
 
     // When
-    presenterWidgetA.setContent(slotB, contentB);
-    presenterWidgetA.setContent(slotC, contentC);
+    presenterWidgetA.setInSlot(slotB, contentB);
+    presenterWidgetA.setInSlot(slotC, contentC);
 
     // Then
     verify(viewAProvider.get()).setContent(slotB, widgetB);
@@ -606,7 +606,7 @@ public class PresenterWidgetImplTest {
   }
 
   @Test
-  public void testSetContentInEmptySlotOnInitiallyVisiblePresenter() {
+  public void testsetInSlotInEmptySlotOnInitiallyVisiblePresenter() {
     // Set-up
     PresenterWidgetA presenterWidgetA = presenterWidgetAProvider.get();
     Object slotB = new Object();
@@ -618,8 +618,8 @@ public class PresenterWidgetImplTest {
     presenterWidgetA.notifyReveal();
 
     // When
-    presenterWidgetA.setContent(slotB, contentB);
-    presenterWidgetA.setContent(slotC, contentC);
+    presenterWidgetA.setInSlot(slotB, contentB);
+    presenterWidgetA.setInSlot(slotC, contentC);
 
     // Then
     verify(viewAProvider.get()).setContent(slotB, widgetB);
@@ -647,10 +647,10 @@ public class PresenterWidgetImplTest {
 
     // Given
     presenterWidgetA.notifyReveal();
-    presenterWidgetA.setContent(slotB, contentB);
+    presenterWidgetA.setInSlot(slotB, contentB);
 
     // When
-    presenterWidgetA.setContent(slotB, null);
+    presenterWidgetA.setInSlot(slotB, null);
 
     // Then
     verify(viewAProvider.get()).setContent(slotB, null);
@@ -719,8 +719,8 @@ public class PresenterWidgetImplTest {
     presenterWidgetB.notifyReveal();
 
     // When
-    presenterWidgetA.setContent(slotCinA, contentC);
-    presenterWidgetB.setContent(slotCinB, contentC);
+    presenterWidgetA.setInSlot(slotCinA, contentC);
+    presenterWidgetB.setInSlot(slotCinB, contentC);
     presenterWidgetB.notifyHide();
 
     // Then
@@ -741,10 +741,10 @@ public class PresenterWidgetImplTest {
     presenterWidgetB.notifyReveal();
 
     // When
-    presenterWidgetA.setContent(slotCinA, contentC);
-    presenterWidgetB.setContent(slotCinB, contentC);
+    presenterWidgetA.setInSlot(slotCinA, contentC);
+    presenterWidgetB.setInSlot(slotCinB, contentC);
     presenterWidgetB.notifyHide();
-    presenterWidgetA.setContent(slotCinA, contentC);
+    presenterWidgetA.setInSlot(slotCinA, contentC);
 
     // Then
     assertTrue(contentC.isVisible());
