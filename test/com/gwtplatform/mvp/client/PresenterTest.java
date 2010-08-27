@@ -37,7 +37,7 @@ import org.junit.runner.RunWith;
  * @author Philippe Beaudoin
  */
 @RunWith(GuiceMockitoJUnitRunner.class)
-public class PresenterImplTest {
+public class PresenterTest {
   /**
    * Guice environment.
    */
@@ -110,7 +110,7 @@ public class PresenterImplTest {
     PresenterA presenter = presenterAProvider.get();
 
     // Given
-    presenter.notifyReveal();
+    presenter.reveal();
     assertTrue(presenter.isVisible());
 
     // When

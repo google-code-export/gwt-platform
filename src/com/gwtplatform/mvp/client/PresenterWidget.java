@@ -66,7 +66,8 @@ import java.util.Map;
  * (top down: first the parent, then the children).</li>
  * </ul>
  * 
- * @param <V> The {@link View} type.
+ * @param <V>
+ *          The {@link View} type.
  * 
  * @author Philippe Beaudoin
  * @author Christian Goudreau
@@ -112,9 +113,12 @@ public abstract class PresenterWidget<V extends View> extends
    * Creates a {@link PresenterWidget} that is not necessarily using automatic
    * binding (see {@link HandlerContainerImpl(boolean)}).
    * 
-   * @param eventBus The {@link EventBus}.
-   * @param view The {@link View}.
-   * @param autoBind {@code true} to request automatic binding, {@code false}
+   * @param eventBus
+   *          The {@link EventBus}.
+   * @param view
+   *          The {@link View}.
+   * @param autoBind
+   *          {@code true} to request automatic binding, {@code false}
    *          otherwise.
    */
   public PresenterWidget(boolean autoBind, EventBus eventBus, V view) {
@@ -128,24 +132,24 @@ public abstract class PresenterWidget<V extends View> extends
    * Creates a {@link PresenterWidget} with automatic binding (see {@link
    * HandlerContainerImpl()}).
    * 
-   * @param eventBus The {@link EventBus}.
-   * @param view The {@link View}.
+   * @param eventBus
+   *          The {@link EventBus}.
+   * @param view
+   *          The {@link View}.
    */
   public PresenterWidget(EventBus eventBus, V view) {
-    super();
-
-    this.eventBus = eventBus;
-    this.view = view;
+    this(true, eventBus, view);
   }
 
   @Override
-  public void addToPopupSlot(final PresenterWidget<? extends PopupView> child) {
+  public final void addToPopupSlot(
+      final PresenterWidget<? extends PopupView> child) {
     addToPopupSlot(child, true);
   }
 
   @Override
-  public void addToPopupSlot(final PresenterWidget<? extends PopupView> child,
-      boolean center) {
+  public final void addToPopupSlot(
+      final PresenterWidget<? extends PopupView> child, boolean center) {
     if (child == null) {
       return;
     }
@@ -173,12 +177,12 @@ public abstract class PresenterWidget<V extends View> extends
       // This presenter is visible, its time to call onReveal
       // on the newly added child (and recursively on this child children)
       monitorCloseEvent(child);
-      child.notifyReveal();
+      child.reveal();
     }
   }
 
   @Override
-  public void addToSlot(Object slot, PresenterWidget<?> content) {
+  public final void addToSlot(Object slot, PresenterWidget<?> content) {
     if (content == null) {
       return;
     }
@@ -193,33 +197,33 @@ public abstract class PresenterWidget<V extends View> extends
       slotChildren.add(content);
       activeChildren.put(slot, slotChildren);
     }
-    getView().addContent(slot, content.getWidget());
+    getView().addToSlot(slot, content.getWidget());
     if (isVisible()) {
       // This presenter is visible, its time to call onReveal
       // on the newly added child (and recursively on this child children)
-      content.notifyReveal();
+      content.reveal();
     }
   }
 
   @Override
-  public void clearSlot(Object slot) {
+  public final void clearSlot(Object slot) {
     List<PresenterWidget<?>> slotChildren = activeChildren.get(slot);
     if (slotChildren != null) {
       // This presenter is visible, its time to call onHide
       // on the children to be removed (and recursively on their children)
       if (isVisible()) {
         for (PresenterWidget<?> activeChild : slotChildren) {
-          activeChild.notifyHide();
+          activeChild.hide();
         }
       }
       slotChildren.clear();
     }
-    getView().setContent(slot, null);
+    getView().setInSlot(slot, null);
   }
 
   @Override
   public void fireEvent(GwtEvent<?> event) {
-    getEventBus().fireEvent(event);
+    getEventBus().fireEvent(this, event);
   }
 
   /**
@@ -227,7 +231,7 @@ public abstract class PresenterWidget<V extends View> extends
    * 
    * @return The view.
    */
-  public final V getView() {
+  public V getView() {
     return view;
   }
 
@@ -253,7 +257,7 @@ public abstract class PresenterWidget<V extends View> extends
   }
 
   @Override
-  public void removeFromSlot(Object slot, PresenterWidget<?> content) {
+  public final void removeFromSlot(Object slot, PresenterWidget<?> content) {
     if (content == null) {
       return;
     }
@@ -265,20 +269,24 @@ public abstract class PresenterWidget<V extends View> extends
       // This presenter is visible, its time to call onHide
       // on the child to be removed (and recursively on itschildren)
       if (isVisible()) {
-        content.notifyHide();
+        content.hide();
       }
       slotChildren.remove(content);
     }
-    getView().removeContent(slot, content.getWidget());
+    getView().removeFromSlot(slot, content.getWidget());
   }
 
+  // TODO This should be final but needs to be overriden in {@link
+  // TabContainerPresenter}
+  // We should be able to do this once we switch to an event-based mechanism for
+  // highlighting tabs
   @Override
   public void setInSlot(Object slot, PresenterWidget<?> content) {
     setInSlot(slot, content, true);
   }
 
   @Override
-  public void setInSlot(Object slot, PresenterWidget<?> content,
+  public final void setInSlot(Object slot, PresenterWidget<?> content,
       boolean performReset) {
     if (content == null) {
       // Assumes the user wants to clear the slot content.
@@ -300,7 +308,7 @@ public abstract class PresenterWidget<V extends View> extends
         // We are visible, make sure the content that we're removing
         // is being notified as hidden
         for (PresenterWidget<?> activeChild : slotChildren) {
-          activeChild.notifyHide();
+          activeChild.hide();
         }
       }
       slotChildren.clear();
@@ -312,11 +320,11 @@ public abstract class PresenterWidget<V extends View> extends
     }
 
     // Set the content in the view
-    getView().setContent(slot, content.getWidget());
+    getView().setInSlot(slot, content.getWidget());
     if (isVisible()) {
       // This presenter is visible, its time to call onReveal
       // on the newly added child (and recursively on this child children)
-      content.notifyReveal();
+      content.reveal();
       if (performReset) {
         // And to reset everything if needed
         ResetPresentersEvent.fire(this);
@@ -329,9 +337,12 @@ public abstract class PresenterWidget<V extends View> extends
    * The handler will be automatically unregistered when
    * {@link HandlerContainer#unbind()} is called.
    * 
-   * @param <H> The handler type
-   * @param type See {@link Type}
-   * @param handler The handler to register
+   * @param <H>
+   *          The handler type
+   * @param type
+   *          See {@link Type}
+   * @param handler
+   *          The handler to register
    */
   protected final <H extends EventHandler> void addRegisteredHandler(
       Type<H> type, H handler) {
@@ -385,16 +396,16 @@ public abstract class PresenterWidget<V extends View> extends
    * Call when you want to hide a presenter. You should fire a
    * {@link ResetPresentersEvent} instead.
    */
-  void notifyHide() {
+  void hide() {
     assert isVisible() : "Hide() called on a hidden presenter!";
     for (List<PresenterWidget<?>> slotChildren : activeChildren.values()) {
       for (PresenterWidget<?> activeChild : slotChildren) {
-        activeChild.notifyHide();
+        activeChild.hide();
       }
     }
     for (PresenterWidget<? extends PopupView> popupPresenter : popupChildren) {
       popupPresenter.getView().setCloseHandler(null);
-      popupPresenter.notifyHide();
+      popupPresenter.hide();
       popupPresenter.getView().hide();
     }
 
@@ -406,14 +417,14 @@ public abstract class PresenterWidget<V extends View> extends
    * Call when you need to reveal a presenter. You should fire a
    * {@link ResetPresentersEvent} instead.
    */
-  void notifyReveal() {
+  void reveal() {
     assert !isVisible() : "notifyReveal() called on a visible presenter!";
     onReveal();
     visible = true;
 
     for (List<PresenterWidget<?>> slotChildren : activeChildren.values()) {
       for (PresenterWidget<?> activeChild : slotChildren) {
-        activeChild.notifyReveal();
+        activeChild.reveal();
       }
     }
     for (PresenterWidget<? extends PopupView> popupPresenter : popupChildren) {
@@ -421,7 +432,7 @@ public abstract class PresenterWidget<V extends View> extends
       // on the newly added child (and recursively on this child children)
       popupPresenter.getView().show();
       monitorCloseEvent(popupPresenter);
-      popupPresenter.notifyReveal();
+      popupPresenter.reveal();
     }
   }
 
@@ -453,8 +464,8 @@ public abstract class PresenterWidget<V extends View> extends
    * Called by a child {@link PresenterWidget} when it wants to detach itself
    * from this parent.
    * 
-   * @param childPresenter The {@link PresenterWidgetImpl} that is a child of
-   *          this presenter.
+   * @param childPresenter
+   *          The {@link PresenterWidgetImpl} that is a child of this presenter.
    */
   private void detach(PresenterWidget<?> childPresenter) {
     for (List<PresenterWidget<?>> slotChildren : activeChildren.values()) {
@@ -467,7 +478,8 @@ public abstract class PresenterWidget<V extends View> extends
    * Makes sure we monitor the specified popup presenter so that we know when it
    * is closing. This way we can make sure it doesn't receive future messages.
    * 
-   * @param popupPresenter The {@link PresenterWidgetImpl} to monitor.
+   * @param popupPresenter
+   *          The {@link PresenterWidgetImpl} to monitor.
    */
   private void monitorCloseEvent(
       final PresenterWidget<? extends PopupView> popupPresenter) {
@@ -477,7 +489,7 @@ public abstract class PresenterWidget<V extends View> extends
       @Override
       public void onClose() {
         if (isVisible()) {
-          popupPresenter.notifyHide();
+          popupPresenter.hide();
         }
         removePopupChildren(popupPresenter);
       }
@@ -487,13 +499,14 @@ public abstract class PresenterWidget<V extends View> extends
   /**
    * Go through the popup children and remove the specified one.
    * 
-   * @param content The {@link PresenterWidget} added as a popup which we now
-   *          remove.
+   * @param content
+   *          The {@link PresenterWidget} added as a popup which we now remove.
    */
   private void removePopupChildren(PresenterWidget<? extends PopupView> content) {
     int i;
     for (i = 0; i < popupChildren.size(); ++i) {
-      PresenterWidget<? extends PopupView> popupPresenter = popupChildren.get(i);
+      PresenterWidget<? extends PopupView> popupPresenter = popupChildren
+          .get(i);
       if (popupPresenter == content) {
         (popupPresenter.getView()).setCloseHandler(null);
         break;
@@ -503,4 +516,64 @@ public abstract class PresenterWidget<V extends View> extends
       popupChildren.remove(i);
     }
   }
+
+  /**
+   * Use {@link PresenterWidget#addToSlot(Object, PresenterWidget))} instead.
+   */
+  @Deprecated
+  public void addContent(Object slot, PresenterWidget<?> content) {
+    addToSlot(slot, content);
+  }
+
+  /**
+   * Use {@link PresenterWidget#clearSlot(Object)} instead.
+   */
+  @Deprecated
+  public void clearContent(Object slot) {
+    clearSlot(slot);
+  }
+
+  /**
+   * Use {@link PresenterWidget#removeFromSlot(Object, PresenterWidget)}
+   * instead.
+   */
+  @Deprecated
+  public void removeContent(Object slot, PresenterWidget<?> content) {
+    removeFromSlot(slot, content);
+  }
+
+  /**
+   * Use {@link PresenterWidget#setInSlot(Object, PresenterWidget)} instead.
+   */
+  @Deprecated
+  public void setContent(Object slot, PresenterWidget<?> content) {
+    setInSlot(slot, content, true);
+  }
+
+  /**
+   * Use {@link PresenterWidget#setInSlot(Object, PresenterWidget, boolean)} instead.
+   */
+  @Deprecated
+  public void setContent(Object slot, PresenterWidget<?> content, boolean performReset) {
+    setInSlot(slot, content, performReset);
+  }
+
+  /**
+   * Use {@link PresenterWidget#addToPopupSlot(PresenterWidget)} instead.
+   */
+  @Deprecated
+  public void addPopupContent(final PresenterWidget<? extends PopupView> content) {
+    addToPopupSlot(content, true);
+  }
+
+  /**
+   * Use {@link PresenterWidget#addToPopupSlot(PresenterWidget, boolean)}
+   * instead.
+   */
+  @Deprecated
+  public void addPopupContent(
+      final PresenterWidget<? extends PopupView> content, boolean center) {
+    addToPopupSlot(content, center);
+  }
+
 }

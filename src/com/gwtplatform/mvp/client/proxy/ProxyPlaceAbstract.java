@@ -79,7 +79,7 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
 
   @Override
   public void fireEvent(GwtEvent<?> event) {
-    eventBus.fireEvent(event);
+    getEventBus().fireEvent(this, event);
   }
 
   @Override
@@ -240,18 +240,31 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
           @Override
           public void execute() {
             presenter.prepareFromRequest(request);
-            if (!presenter.isVisible()) {
-              // This will trigger a reset in due time
-              presenter.forceReveal(); 
-            } else {
-              // We have to do the reset ourselves
-              presenter.forceReveal(); 
-              ResetPresentersEvent.fire(ProxyPlaceAbstract.this); 
+            if (!presenter.useManualReveal()) {
+              // Automatic reveal
+              manualReveal(presenter);
             }
           }
         });
       }
     });
+  }
+
+  @Override
+  public void manualReveal(Presenter<?, ?> presenter) {
+    if (!presenter.isVisible()) {
+      // This will trigger a reset in due time
+      presenter.forceReveal();
+    } else {
+      // We have to do the reset ourselves
+      ResetPresentersEvent.fire(this);
+    }
+    placeManager.unlock();
+  }
+
+  @Override
+  public void manualRevealFailed() {
+    placeManager.unlock();
   }
 
 }
