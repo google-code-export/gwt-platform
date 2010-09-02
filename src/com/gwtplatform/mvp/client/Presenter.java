@@ -74,28 +74,6 @@ public abstract class Presenter<V extends View, Proxy_ extends Proxy<?>> extends
   }
 
   /**
-   * <b>Deprecated!</b> This method will soon be removed from the API. For more
-   * information see <a
-   * href="http://code.google.com/p/gwt-platform/issues/detail?id=136">Issue
-   * 136</a>.
-   * <p />
-   * Notify others that this presenter has been changed. This is especially
-   * useful for stateful presenters that store parameters within the history
-   * token. Calling this will make sure the history token is updated with the
-   * right parameters.
-   */
-  @Deprecated
-  protected final void notifyChange() {
-    getProxy().onPresenterChanged(this);
-  }
-
-  @Override
-  protected void onReset() {
-    super.onReset();
-    getProxy().onPresenterRevealed(this);
-  }
-
-  /**
    * Verifies if this presenter can be revealed automatically or if it is meant to be
    * revealed manually.
    * Normally, the user wants to reveal a presenter manually when it cannot be used
@@ -133,36 +111,39 @@ public abstract class Presenter<V extends View, Proxy_ extends Proxy<?>> extends
    * <p />
    * If your presenter needs to fetch some information from the server while
    * preparing itself, consider using manual reveal. See {@link #useManualReveal()}.
+   * <p />
+   * If you want to redirect to another page within this method you also have to use
+   * manual reveal and call 
+   * {@link com.gwtplatform.mvp.client.proxy.ProxyPlace#manualRevealFailed()} 
+   * before the redirection. Here is an example of a {@link #prepareFromRequest(PlaceRequest)}
+   * method aborting early if an error is encountered:
+   * <pre>
+   * <code>
+   *  {@literal}@Override
+   *  public boolean useManualReveal() {
+   *    return true;
+   *  }
+   *
+   *  {@literal}@Override
+   *  public void prepareFromRequest(PlaceRequest placeRequest) {
+   *    super.prepareFromRequest(placeRequest);
+   *    
+   *    if (isInvalidRequest(placeRequest))
+   *    {
+   *      getProxy().manualRevealFailed();
+   *      placeManager.revealErrorPlace(placeRequest.getNameToken());
+   *    } else {
+   *      processRequest(placeRequest);
+   *      getProxy().manualReveal(this);  
+   *    }
+   *  }
+   * </code>
+   * </pre>
    * 
-   * @param request The request.
+   * @param request The {@link PlaceRequest}.
    */
   public void prepareFromRequest(PlaceRequest request) {
-  }
-  
-  /**
-   * This method is called when creating a {@link PlaceRequest} for this
-   * {@link Presenter}. The presenter should add all the required parameters to
-   * the request.
-   * <p/>
-   * <p/>
-   * If nothing is to be done, simply return the {@code request} unchanged.
-   * Otherwise, call {@link PlaceRequest#with(String, String)} to add
-   * parameters. Eg:
-   * <p/>
-   * 
-   * <pre>
-   * return request.with( &quot;id&quot;, getId() );
-   * </pre>
-   * <p/>
-   * A presenter should override this method if it handles custom parameters,
-   * but it should call the parent's {@code prepareRequest} method.
-   * 
-   * @param request The current request.
-   * @return The prepared place request.
-   */
-  public PlaceRequest prepareRequest(PlaceRequest request) {
-    return request;
-  }
+  }  
   
   /**
    * Called whenever the presenter needs to set its content in a parent. You
