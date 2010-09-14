@@ -17,9 +17,14 @@
 package com.gwtplatform.dispatch.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
+import com.gwtplatform.dispatch.client.actionhandler.AsyncExecute;
+import com.gwtplatform.dispatch.client.actionhandler.AsyncUndo;
+import com.gwtplatform.dispatch.client.actionhandler.ClientActionHandler;
+import com.gwtplatform.dispatch.client.actionhandler.ClientActionHandlerRegistry;
 import com.gwtplatform.dispatch.shared.Action;
 import com.gwtplatform.dispatch.shared.Result;
 
@@ -30,17 +35,21 @@ import com.gwtplatform.dispatch.shared.Result;
  * 
  * @author David Peterson
  * @author Christian Goudreau
+ * @author Brendan Doherty
  */
 public class DefaultDispatchAsync implements DispatchAsync {
   private static final DispatchServiceAsync realService = GWT.create(DispatchService.class);
   private final String baseUrl;
   private final ExceptionHandler exceptionHandler;
   private final SecurityCookieAccessor securityCookieAccessor;
+  private final ClientActionHandlerRegistry registry;
 
   public DefaultDispatchAsync(ExceptionHandler exceptionHandler,
-      SecurityCookieAccessor securityCookieAccessor) {
+      SecurityCookieAccessor securityCookieAccessor,
+      ClientActionHandlerRegistry registry) {
     this.exceptionHandler = exceptionHandler;
     this.securityCookieAccessor = securityCookieAccessor;
+    this.registry = registry;
     String entryPointUrl = ((ServiceDefTarget) realService).getServiceEntryPoint();
     if (entryPointUrl == null) {
       this.baseUrl = "";
@@ -54,22 +63,48 @@ public class DefaultDispatchAsync implements DispatchAsync {
     ((ServiceDefTarget) realService).setServiceEntryPoint(baseUrl
         + action.getServiceName());
 
-    String securityCookie = securityCookieAccessor.getCookieContent();
+    final String securityCookie = securityCookieAccessor.getCookieContent();
 
-    return DispatchRequestFactory.createRequest(realService.execute(
-        securityCookie, action, new AsyncCallback<Result>() {
+    final ClientActionHandler<A, R> clientActionHandler = registry.find(action.getClass());
+    if (clientActionHandler != null) {
+      final FakeDispatchRequest request = new FakeDispatchRequest();
+      clientActionHandler.execute(action, callback, new AsyncExecute<A, R>() {
+
+        @Override
+        public void execute(A action, AsyncCallback<R> resultCallback) {
+          if (!request.isCancelled()) {
+            request.setRequest(serviceExecute(securityCookie, action,
+                resultCallback));
+          }
+        }
+
+      });
+      return request;
+
+    } else {
+
+      return DispatchRequestFactory.createRequest(serviceExecute(
+          securityCookie, action, callback));
+    }
+  }
+
+  private <A extends Action<R>, R extends Result> Request serviceExecute(
+      String securityCookie, final A action, final AsyncCallback<R> callback) {
+    return realService.execute(securityCookie, action,
+        new AsyncCallback<Result>() {
           public void onFailure(Throwable caught) {
             DefaultDispatchAsync.this.onExecuteFailure(action, caught, callback);
           }
 
           @SuppressWarnings("unchecked")
           public void onSuccess(Result result) {
+
             // Note: This cast is a dodgy hack to get around a GWT 1.6 async
             // compiler issue
             DefaultDispatchAsync.this.onExecuteSuccess(action, (R) result,
                 callback);
           }
-        }));
+        });
   }
 
   @Override
@@ -78,10 +113,37 @@ public class DefaultDispatchAsync implements DispatchAsync {
     ((ServiceDefTarget) realService).setServiceEntryPoint(baseUrl
         + action.getServiceName());
 
-    String securityCookie = securityCookieAccessor.getCookieContent();
+    final String securityCookie = securityCookieAccessor.getCookieContent();
 
-    return DispatchRequestFactory.createRequest(realService.undo(
-        securityCookie, action, result, new AsyncCallback<Void>() {
+    final ClientActionHandler<A, R> clientActionHandler = registry.find(action.getClass());
+    if (clientActionHandler != null) {
+      final FakeDispatchRequest request = new FakeDispatchRequest();
+      clientActionHandler.undo(action, result, callback, new AsyncUndo<A, R>() {
+
+        @Override
+        public void undo(A action, R result, AsyncCallback<Void> callback) {
+          if (!request.isCancelled()) {
+            request.setRequest(serviceUndo(securityCookie, action, result,
+                callback));
+          }
+        }
+
+      });
+      return request;
+
+    } else {
+
+      return DispatchRequestFactory.createRequest(serviceUndo(securityCookie,
+          action, result, callback));
+    }
+  }
+
+  private <A extends Action<R>, R extends Result> Request serviceUndo(
+      String securityCookie, final A action, final R result,
+      final AsyncCallback<Void> callback) {
+
+    return realService.undo(securityCookie, action, result,
+        new AsyncCallback<Void>() {
           public void onFailure(Throwable caught) {
             DefaultDispatchAsync.this.onUndoFailure(action, caught, callback);
           }
@@ -90,7 +152,7 @@ public class DefaultDispatchAsync implements DispatchAsync {
             DefaultDispatchAsync.this.onUndoSuccess(action, voidResult,
                 callback);
           }
-        }));
+        });
   }
 
   protected <A extends Action<R>, R extends Result> void onExecuteFailure(
