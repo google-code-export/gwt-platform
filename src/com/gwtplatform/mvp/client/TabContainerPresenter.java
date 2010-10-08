@@ -16,12 +16,43 @@
 
 package com.gwtplatform.mvp.client;
 
+import com.google.gwt.event.shared.GwtEvent.Type;
+import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.TabContentProxy;
 
 /**
+ * A presenter that can display many tabs and the content of one of these tabs.
+ *
+ * @param <V> The specific type of the {@link View}. Must implement
+ *          {@link TabPanel}.
+ * @param <Proxy_> The specific type of the proxy, must be a
+ *          {@link TabContainerProxy}.
+ * 
  * @author Philippe Beaudoin
+ * @author Christian Goudreau
  */
-public interface TabContainerPresenter extends Presenter {
+public abstract class TabContainerPresenter<V extends View & TabPanel, Proxy_ extends Proxy<?>> extends Presenter<V, Proxy_> {
+  private final Type<RequestTabsHandler> requestTabsEventType;
+  private final Object tabContentSlot;
+  
+  /**
+   * Create a presenter that can display many tabs and the content of one of
+   * these tabs.
+   * 
+   * @param eventBus The {@link EventBus}.
+   * @param view The {@link View}.
+   * @param proxy The proxy, a {@link TabContainerProxy}.
+   * @param tabContentSlot An opaque object identifying the slot in which the
+   *          main content should be displayed.
+   * @param requestTabsEventType The {@link Type} of the object to fire to
+   *          identify all the displayed tabs.
+   */
+  public TabContainerPresenter(EventBus eventBus, V view, Proxy_ proxy,
+      Object tabContentSlot, Type<RequestTabsHandler> requestTabsEventType) {
+    super(eventBus, view, proxy);
+    this.tabContentSlot = tabContentSlot;
+    this.requestTabsEventType = requestTabsEventType;
+  }
 
   /**
    * Adds a new tab to this presenter.
@@ -30,6 +61,45 @@ public interface TabContainerPresenter extends Presenter {
    *          tab to add.
    * @return The newly added tab.
    */
-  Tab addTab(TabContentProxy<?> tabProxy);
+  public Tab addTab(final TabContentProxy<?> tabProxy) {
+    return getView().addTab(tabProxy.getLabel(), tabProxy.getHistoryToken(),
+        tabProxy.getPriority());
+  }
+  
+  @Override
+  public void setInSlot(Object slot, PresenterWidget<?> content) {
+    super.setInSlot(slot, content);
+    
+    // TODO: Consider switching this to an event bus based mechanism where the
+    // child presenter fires an event when it is revealed and the parent highlights the tab.
 
+    // If we're setting a presenter attached to an actual slot, then highlight the tab
+    if (slot == tabContentSlot) {
+      try {
+        Presenter<?,?> presenter = (Presenter<?,?>) content;
+        TabContentProxy<?> proxy = (TabContentProxy<?>) presenter.getProxy();
+        getView().setActiveTab(proxy.getTab());
+      } catch (Exception e) {
+        // We can't cast, no worry, we just won't highlight a tab
+      }      
+    }
+  }
+  
+  @Override
+  protected void onBind() {
+    super.onBind();
+
+    // The following call will trigger a series of call to addTab, so
+    // we should make sure we clear all the tabs when unbinding.
+    RequestTabsEvent.fire(this, requestTabsEventType, this);
+  }
+
+  @Override
+  protected void onUnbind() {
+    super.onUnbind();
+
+    // The tabs are added indirectly in onBind() via the RequestTabsEvent, so we
+    // clear them now.
+    getView().removeTabs();
+  }
 }

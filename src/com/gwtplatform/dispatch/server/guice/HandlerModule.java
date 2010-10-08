@@ -11,12 +11,12 @@ package com.gwtplatform.dispatch.server.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.internal.UniqueAnnotations;
-import com.gwtplatform.dispatch.server.actionHandler.ActionHandler;
-import com.gwtplatform.dispatch.server.actionHandlerValidator.ActionHandlerValidatorClass;
-import com.gwtplatform.dispatch.server.actionHandlerValidator.ActionHandlerValidatorMap;
-import com.gwtplatform.dispatch.server.actionHandlerValidator.ActionHandlerValidatorMapImpl;
-import com.gwtplatform.dispatch.server.actionValidator.ActionValidator;
-import com.gwtplatform.dispatch.server.guice.actionValidator.DefaultActionValidator;
+import com.gwtplatform.dispatch.server.actionhandler.ActionHandler;
+import com.gwtplatform.dispatch.server.actionhandlervalidator.ActionHandlerValidatorClass;
+import com.gwtplatform.dispatch.server.actionhandlervalidator.ActionHandlerValidatorMap;
+import com.gwtplatform.dispatch.server.actionhandlervalidator.ActionHandlerValidatorMapImpl;
+import com.gwtplatform.dispatch.server.actionvalidator.ActionValidator;
+import com.gwtplatform.dispatch.server.guice.actionvalidator.DefaultActionValidator;
 import com.gwtplatform.dispatch.shared.Action;
 import com.gwtplatform.dispatch.shared.Result;
 
@@ -28,6 +28,7 @@ import com.gwtplatform.dispatch.shared.Result;
  * @author David Peterson
  */
 public abstract class HandlerModule extends AbstractModule {
+  
 
 	/**
 	 * @param <A> Type of {@link Action}

@@ -17,15 +17,21 @@
 package com.gwtplatform.mvp.client.proxy;
 
 import com.google.gwt.event.shared.GwtEvent;
-
+import com.gwtplatform.mvp.client.EventBus;
 import com.gwtplatform.mvp.client.HasEventBus;
 import com.gwtplatform.mvp.client.Presenter;
 
 /**
- * Use this type of event to reveal content that should get added as the
- * {@link com.google.gwt.user.client.ui.RootPanel}. This type of content is
- * usually meant to use the browser like a regular webpage, adding a vertical
+ * This event is fired by a {@link Presenter} that desires to reveal itself
+ * at the root of the application. It is typically fired in the {@link Presenter#revealInParent()}
+ * method.
+ * <p />
+ * This type of content is usually meant to use the browser like a regular webpage, adding a vertical
  * scrollbar as the content overflow.
+ * 
+ * @see RevealContentEvent
+ * @see RevealRootLayoutContentEvent
+ * @see RevealRootPopupContentEvent
  * 
  * @author Philippe Beaudoin
  */
@@ -34,7 +40,22 @@ public final class RevealRootContentEvent extends
 
   private static final Type<RevealRootContentHandler> TYPE = new Type<RevealRootContentHandler>();
 
-  public static void fire(final HasEventBus source, final Presenter content) {
+  /**
+   * Fires a {@link RevealRootContentEvent} 
+   * into a source that has access to an {@link EventBus}. 
+   * 
+   * @param source The source that fires this event ({@link HasEventBus}).
+   * @param content The {@link Presenter} that wants to set itself as root content.
+   */
+  public static void fire(final HasEventBus source, final Presenter<?, ?> content) {
+    source.fireEvent(new RevealRootContentEvent(content));
+  }
+
+  /**
+   * Deprecated, use {@link #fire(HasEventBus, Presenter)} instead.
+   */
+  @Deprecated
+  public static void fire(final EventBus source, final Presenter<?, ?> content) {
     source.fireEvent(new RevealRootContentEvent(content));
   }
 
@@ -42,9 +63,9 @@ public final class RevealRootContentEvent extends
     return TYPE;
   }
 
-  private final Presenter content;
+  private final Presenter<?, ?> content;
 
-  public RevealRootContentEvent(Presenter content) {
+  public RevealRootContentEvent(Presenter<?, ?> content) {
     this.content = content;
   }
 
@@ -53,7 +74,7 @@ public final class RevealRootContentEvent extends
     return getType();
   }
 
-  public Presenter getContent() {
+  public Presenter<?, ?> getContent() {
     return content;
   }
 

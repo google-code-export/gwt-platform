@@ -24,14 +24,13 @@ import com.google.inject.Inject;
 
 import com.gwtplatform.mvp.client.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.PresenterImpl;
 
 /**
  * A useful mixing class to define a {@link Proxy} that is also a {@link Place}.
  * You can usually inherit from the simpler form {@link ProxyPlace}.
  * <p />
  * 
- * @param <P> Type of the associated {@link Presenter}.
+ * @param <P> The Presenter's type.
  * @param <Proxy_> Type of the associated {@link Proxy}.
  * 
  * @author David Peterson
@@ -40,7 +39,7 @@ import com.gwtplatform.mvp.client.PresenterImpl;
  */
 @SuppressWarnings("deprecation")
 // TODO: Remove after making members private
-public class ProxyPlaceAbstract<P extends Presenter, Proxy_ extends Proxy<P>>
+public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<P>>
     implements ProxyPlace<P> {
 
   /**
@@ -80,7 +79,7 @@ public class ProxyPlaceAbstract<P extends Presenter, Proxy_ extends Proxy<P>>
 
   @Override
   public void fireEvent(GwtEvent<?> event) {
-    eventBus.fireEvent(event);
+    getEventBus().fireEvent(this, event);
   }
 
   @Override
@@ -102,7 +101,7 @@ public class ProxyPlaceAbstract<P extends Presenter, Proxy_ extends Proxy<P>>
   }
 
   @Override
-  public void getRawPresenter(AsyncCallback<Presenter> callback) {
+  public void getRawPresenter(AsyncCallback<Presenter<?, ?>> callback) {
     proxy.getRawPresenter(callback);
   }
 
@@ -114,20 +113,6 @@ public class ProxyPlaceAbstract<P extends Presenter, Proxy_ extends Proxy<P>>
   @Override
   public boolean matchesRequest(PlaceRequest request) {
     return place.matchesRequest(request);
-  }
-
-  @Override
-  public void onPresenterChanged(Presenter presenter) {
-    proxy.onPresenterChanged(presenter);
-    placeManager.onPlaceChanged(((PresenterImpl<?, ?>) presenter).prepareRequest(new PlaceRequest(
-        getNameToken())));
-  }
-
-  @Override
-  public void onPresenterRevealed(Presenter presenter) {
-    proxy.onPresenterRevealed(presenter);
-    placeManager.onPlaceRevealed(((PresenterImpl<?, ?>) presenter).prepareRequest(new PlaceRequest(
-        getNameToken())));
   }
 
   // /////////////////////
@@ -230,19 +215,19 @@ public class ProxyPlaceAbstract<P extends Presenter, Proxy_ extends Proxy<P>>
         // request,
         // in case it wants to fire some events. That's why we will do this in a
         // deferred command.
-        DeferredCommand.addCommand(new Command() {
+        addDeferredCommand(new Command() {
           @Override
           public void execute() {
-            PresenterImpl<?, ?> presenterImpl = (PresenterImpl<?, ?>) presenter;
-            presenterImpl.prepareFromRequest(request);
-            if (!presenter.isVisible()) {
-              presenterImpl.forceReveal(); // This will trigger a reset in due
-                                           // time
-            } else {
-              ResetPresentersEvent.fire(ProxyPlaceAbstract.this); // We have to
-                                                                  // do the
-                                                                  // reset
-                                                                  // ourselves
+            PlaceRequest originalRequest = placeManager.getCurrentPlaceRequest();
+            presenter.prepareFromRequest(request);
+            if (originalRequest == placeManager.getCurrentPlaceRequest()) {
+              // User did not manually update place request in prepareFromRequest, update it here.
+              placeManager.updateHistory(request);
+            }
+            NavigationEvent.fire(placeManager, request);
+            if (!presenter.useManualReveal()) {
+              // Automatic reveal
+              manualReveal(presenter);
             }
           }
         });
@@ -250,4 +235,34 @@ public class ProxyPlaceAbstract<P extends Presenter, Proxy_ extends Proxy<P>>
     });
   }
 
+  @Override
+  public void manualReveal(Presenter<?, ?> presenter) {
+    // Reveal only if there are no pending navigation requests
+    if (!placeManager.hasPendingNavigation()) {    
+      if (!presenter.isVisible()) {
+        // This will trigger a reset in due time
+        presenter.forceReveal();
+      } else {
+        // We have to do the reset ourselves
+        ResetPresentersEvent.fire(this);
+      }
+    }
+    placeManager.unlock();
+  }
+
+  @Override
+  public void manualRevealFailed() {
+    placeManager.unlock();
+  }
+
+  /**
+   * This method allows unit test to handle deferred command with a mechanism that doesn't
+   * require a GWTTestCase.
+   * 
+   * @param command The {@Command} to defer, see {@link DeferredCommand}.
+   */
+  void addDeferredCommand(Command command) {
+    DeferredCommand.addCommand(command);
+  }
+  
 }
