@@ -21,8 +21,10 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.gwtplatform.mvp.client.HasEventBus;
 
 /**
- * Event fired when a user refuse to leave a page. See
- * {@link PlaceManager#setOnLeaveConfirmation}
+ * Event fired when a user refuses to leave a page. See
+ * {@link PlaceManager#setOnLeaveConfirmation}.
+ * 
+ * @see NavigationEvent
  * 
  * @author Christian Goudreau
  */
@@ -30,6 +32,12 @@ public final class NavigationRefusedEvent extends
     GwtEvent<NavigationRefusedHandler> {
   private static final Type<NavigationRefusedHandler> TYPE = new Type<NavigationRefusedHandler>();
 
+  /**
+   * Fires a {@link NavigationRefusedEvent} 
+   * into a source that has access to an {@link com.gwtplatform.mvp.client.EventBus}.
+   * 
+   * @param source The source that fires this event ({@link HasEventBus}).
+   */
   public static void fire(final HasEventBus source) {
     source.fireEvent(new NavigationRefusedEvent());
   }

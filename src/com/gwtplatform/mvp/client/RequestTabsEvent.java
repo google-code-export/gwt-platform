@@ -19,17 +19,28 @@ package com.gwtplatform.mvp.client;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
+ * This event is fired by the {@link TabContainerPresenter} to identify all
+ * presenters that should display their tabs within it.
+ * 
  * @author Philippe Beaudoin
  */
 public final class RequestTabsEvent extends GwtEvent<RequestTabsHandler> {
 
+  /**
+   * Fires a {@link RequestTabsEvent} with a specific {@link Type}
+   * into a source that has access to an {@link EventBus}. 
+   * 
+   * @param source The source that fires this event ({@link HasEventBus}).
+   * @param type The specific event {@link Type}.
+   * @param tabContainer The {@link TabContainerPresenter} requesting the tabs.
+   */
   public static void fire(final HasEventBus source,
-      final Type<RequestTabsHandler> type, TabContainerPresenter tabContainer) {
+      final Type<RequestTabsHandler> type, TabContainerPresenter<?, ?> tabContainer) {
 
     source.fireEvent(new RequestTabsEvent(type, tabContainer));
   }
 
-  private final TabContainerPresenter tabContainer;
+  private final TabContainerPresenter<?, ?> tabContainer;
   private final Type<RequestTabsHandler> type;
 
   /**
@@ -40,7 +51,7 @@ public final class RequestTabsEvent extends GwtEvent<RequestTabsHandler> {
    * @param tabContainer The {@link TabContainerPresenter} making the request.
    */
   public RequestTabsEvent(final Type<RequestTabsHandler> type,
-      TabContainerPresenter tabContainer) {
+      TabContainerPresenter<?, ?> tabContainer) {
     this.type = type;
     this.tabContainer = tabContainer;
   }
@@ -50,7 +61,7 @@ public final class RequestTabsEvent extends GwtEvent<RequestTabsHandler> {
     return type;
   }
 
-  public TabContainerPresenter getTabContainer() {
+  public TabContainerPresenter<?, ?> getTabContainer() {
     return tabContainer;
   }
 

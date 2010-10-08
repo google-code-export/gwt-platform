@@ -31,7 +31,7 @@ import java.util.List;
  * @author Christian Goudreau
  */
 public interface PlaceManager extends HasEventBus {
-
+  
   /**
    * Builds a string corresponding to the history token to reveal the specified
    * {@link PlaceRequest}. This can be used with a
@@ -146,9 +146,9 @@ public interface PlaceManager extends HasEventBus {
 
   /**
    * Access the current place request, that is, the tail of the place request
-   * hierarchy.
+   * hierarchy. If the hierarchy is empty this returns an empty {@link PlaceRequest}.
    * 
-   * @return The current {@link PlaceRequest}.
+   * @return The current {@link PlaceRequest}, or an empty one if the hierarchy is empty.
    * 
    * @see {@link #getCurrentPlaceHierarchy()}
    */
@@ -214,20 +214,18 @@ public interface PlaceManager extends HasEventBus {
   void navigateBack();
 
   /**
-   * Called whenever the current place has changed in a way that requires
-   * history parameters to be modified.
+   * Updates History, without firing a {@link com.google.gwt.event.logical.shared.ValueChangeEvent}.
+   * Only the last {@link PlaceRequest} of the place request hierarchy is modified.   
+   * <p />
+   * This method will only work if the passed {@link PlaceRequest} has the same name token
+   * as the current place request (see {@link #getCurrentPlaceRequest()}.
+   * <p />
+   * This method causes a new token to be added to the browser history, affecting the behavior
+   * of the browser's <em>back</em> button.
    * 
-   * @param placeRequest The {@link PlaceRequest} portraying the change.
+   * @param request The {@link PlaceRequest} to display in the updated history.
    */
-  void onPlaceChanged(PlaceRequest placeRequest);
-
-  /**
-   * Called whenever a new place has been revealed.
-   * 
-   * @param placeRequest The {@link PlaceRequest} for the place that has just
-   *          been revealed.
-   */
-  void onPlaceRevealed(PlaceRequest placeRequest);
+  void updateHistory(PlaceRequest request);
 
   /**
    * Reveals the place corresponding to the current value of the history token
@@ -402,5 +400,25 @@ public interface PlaceManager extends HasEventBus {
    *          the head of the hierarchy before appending the {@code request}.
    */
   void revealRelativePlace(PlaceRequest request, int level);
+
+  /**
+   * Resets the navigation lock if it is currently set. You should usually not call this
+   * directly, instead it is meant to be used with presenters that use manual reveal via
+   * {@link ProxyPlace#manualReveal(com.gwtplatform.mvp.client.Presenter)} and 
+   * {@link ProxyPlace#manualRevealFailed()}.
+   * 
+   * @see com.gwtplatform.mvp.client.Presenter#useManualReveal()
+   * @see ProxyPlace#manualReveal(com.gwtplatform.mvp.client.Presenter)
+   * @see ProxyPlace#manualRevealFailed()
+   */
+  void unlock();
+
+  /**
+   * Checks if the {@link PlaceManager} has to perform any pending navigation that were
+   * not immediately executed because it was requested while the navigation was locked.
+   * 
+   * @return {@code true} if there are any pending navigation requests, {@code false} otherwise.
+   */
+  boolean hasPendingNavigation();
 
 }

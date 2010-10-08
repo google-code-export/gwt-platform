@@ -21,6 +21,14 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.gwtplatform.mvp.client.HasEventBus;
 
 /**
+ * This event is fired whenever all visible presenters should
+ * be reset. This is fired automatically right after navigating to a
+ * new place.
+ * <p />
+ * The default implementation or {@link com.gwtplatform.mvp.client.RootPresenter} causes 
+ * {@link com.gwtplatform.mvp.client.PresenterWidget#onReset()} 
+ * to be called, starting from the top level presenter and going down.
+ * 
  * @author Philippe Beaudoin
  */
 public final class ResetPresentersEvent extends
@@ -28,6 +36,12 @@ public final class ResetPresentersEvent extends
 
   private static final Type<ResetPresentersHandler> type = new Type<ResetPresentersHandler>();
 
+  /**
+   * Fires a {@link ResetPresentersEvent} 
+   * into a source that has access to an {@link com.gwtplatform.mvp.client.EventBus}. 
+   * 
+   * @param source The source that fires this event ({@link HasEventBus}).
+   */
   public static void fire(final HasEventBus source) {
     source.fireEvent(new ResetPresentersEvent());
   }

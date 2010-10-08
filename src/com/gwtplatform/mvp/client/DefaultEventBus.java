@@ -16,19 +16,26 @@
 
 package com.gwtplatform.mvp.client;
 
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.GwtEventHelper;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * @author David Peterson
  */
-@Singleton
 public final class DefaultEventBus extends HandlerManager implements EventBus {
 
   @Inject
   public DefaultEventBus() {
     super(null);
+  }
+
+  @Override
+  public void fireEvent(HasEventBus source, GwtEvent<?> event) {
+    GwtEventHelper.setSource(event, source);
+    
+    fireEvent(event);
   }
 
 }

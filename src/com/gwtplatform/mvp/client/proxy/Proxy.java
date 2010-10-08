@@ -28,16 +28,14 @@ import com.gwtplatform.mvp.client.Presenter;
  * <p />
  * The relationship between a presenter and its proxy is two-way.
  * <p />
- * This class is called PresenterProxy instead of simply Proxy because
  * {@link Presenter} subclasses will usually define their own interface called
- * Proxy and derived from this one. Naming this interface Proxy would therefore
- * be impractical for code-writing purposes.
+ * MyProxy and be derived from this one.
  * 
- * @param <P> {@link Presenter}'s type.
+ * @param <P> The presenter's type.
  * 
- * @author beaudoin
+ * @author Philippe Beaudoin
  */
-public interface Proxy<P extends Presenter> extends ProxyRaw {
+public interface Proxy<P extends Presenter<?, ?>> extends ProxyRaw {
 
   /**
    * Get the associated {@link Presenter}. The presenter can only be obtained in
@@ -48,5 +46,4 @@ public interface Proxy<P extends Presenter> extends ProxyRaw {
    *          as a parameter.
    */
   void getPresenter(AsyncCallback<P> callback);
-
 }

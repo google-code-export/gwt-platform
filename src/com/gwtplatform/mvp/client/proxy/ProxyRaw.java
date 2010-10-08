@@ -41,23 +41,6 @@ public interface ProxyRaw {
    * @param callback The callback in which the {@link Presenter} will be passed
    *          as a parameter.
    */
-  void getRawPresenter(AsyncCallback<Presenter> callback);
-
-  /**
-   * Called by this proxy's presenter whenever it has changed in a way that
-   * would require the parameters in the HistoryToken bar to be changed. If you
-   * override, make sure you call your parent onPresenterChanged().
-   * 
-   * @param presenter The {@link Presenter} that has just changed.
-   */
-  void onPresenterChanged(Presenter presenter);
-
-  /**
-   * Called by this proxy's presenter whenever it has been revealed. If you
-   * override, make sure you call your parent onPresenterRevealed().
-   * 
-   * @param presenter The {@link Presenter} that has just been revealed.
-   */
-  void onPresenterRevealed(Presenter presenter);
+  void getRawPresenter(AsyncCallback<Presenter<?, ?>> callback);
 
 }

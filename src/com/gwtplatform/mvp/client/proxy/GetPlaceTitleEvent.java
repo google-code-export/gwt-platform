@@ -21,7 +21,6 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.gwtplatform.mvp.client.HasEventBus;
 
 /**
- * 
  * This event is fired whenever the user wants to have access to the title of a
  * place.
  * <p />
@@ -36,9 +35,13 @@ public class GetPlaceTitleEvent extends GwtEvent<GetPlaceTitleHandler> {
   private static Type<GetPlaceTitleHandler> TYPE;
 
   /**
-   * Fires a {@link GetPlaceTitleEvent} into the {@link EventBus}.
+   * Fires a {@link GetPlaceTitleEvent}
+   * into a source that has access to an {@link com.gwtplatform.mvp.client.EventBus}.
+   * <p />
+   * <b>Important!</b> You should never fire that event directly. See
+   * {@link GetPlaceTitleEvent} for details.
    * 
-   * @param source The source from wich it was fired.
+   * @param source The source that fires this event ({@link HasEventBus}).
    * @param request The {@link PlaceRequest} for which to obtain the title.
    * @param handler The {@link SetPlaceTitleHandler} that will be invoked when
    *          the title is obtained.
@@ -61,7 +64,7 @@ public class GetPlaceTitleEvent extends GwtEvent<GetPlaceTitleHandler> {
    * be responsible for this event. Handlers should not process this event if
    * {@link isHandled()} return {@code true}.
    */
-  private boolean handled = false;
+  private boolean handled;
 
   private final SetPlaceTitleHandler handler;
 

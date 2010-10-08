@@ -19,13 +19,14 @@ package com.gwtplatform.dispatch.client.gin;
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-
 import com.gwtplatform.dispatch.client.DefaultDispatchAsync;
 import com.gwtplatform.dispatch.client.DefaultExceptionHandler;
 import com.gwtplatform.dispatch.client.DefaultSecurityCookieAccessor;
 import com.gwtplatform.dispatch.client.DispatchAsync;
 import com.gwtplatform.dispatch.client.ExceptionHandler;
 import com.gwtplatform.dispatch.client.SecurityCookieAccessor;
+import com.gwtplatform.dispatch.client.actionhandler.ClientActionHandlerRegistry;
+import com.gwtplatform.dispatch.client.actionhandler.DefaultClientActionHandlerRegistry;
 
 /**
  * This gin module provides provides access to the {@link DispatchAsync}
@@ -38,8 +39,7 @@ import com.gwtplatform.dispatch.client.SecurityCookieAccessor;
  * If you want to prevent XSRF attack (you use secured
  * {@link com.gwtplatform.dispatch.shared.Action}s) the default
  * {@link EmptySecurityCookieAccessor} could leave your application vulnerable
- * to XSRF attacks. For more details see <a href=
- * "http://code.google.com/intl/fr/webtoolkit/articles/security_for_gwt_applications.html"
+ * to XSRF attacks. For more details see <a href="http://code.google.com/intl/fr/webtoolkit/articles/security_for_gwt_applications.html"
  * > this document</a>. For more security use {@link DispatchAsyncSecureModule}.
  * <p />
  * If you don't need XSRF protection, you can use directly this module with your
@@ -59,43 +59,54 @@ import com.gwtplatform.dispatch.client.SecurityCookieAccessor;
  * 
  * @author David Peterson
  * @author Philippe Beaudoin
+ * @author Brendan Doherty
  */
 public class DispatchAsyncModule extends AbstractGinModule {
   protected final Class<? extends ExceptionHandler> exceptionHandlerType;
   protected final Class<? extends SecurityCookieAccessor> sessionAccessorType;
+  protected final Class<? extends ClientActionHandlerRegistry> clientActionHandlerRegistryType;
 
   public DispatchAsyncModule() {
-    this.exceptionHandlerType = null;
-    this.sessionAccessorType = null;
+    this(DefaultExceptionHandler.class, DefaultSecurityCookieAccessor.class,
+        DefaultClientActionHandlerRegistry.class);
   }
 
   public DispatchAsyncModule(
       Class<? extends ExceptionHandler> exceptionHandlerType,
       Class<? extends SecurityCookieAccessor> sessionAccessorType) {
+    this(exceptionHandlerType, sessionAccessorType,
+        DefaultClientActionHandlerRegistry.class);
+  }
+
+  public DispatchAsyncModule(
+      Class<? extends ClientActionHandlerRegistry> clientActionHandlerRegistryType) {
+    this(DefaultExceptionHandler.class, DefaultSecurityCookieAccessor.class,
+        clientActionHandlerRegistryType);
+  }
+
+  public DispatchAsyncModule(
+      Class<? extends ExceptionHandler> exceptionHandlerType,
+      Class<? extends SecurityCookieAccessor> sessionAccessorType,
+      Class<? extends ClientActionHandlerRegistry> clientActionHandlerRegistryType) {
     this.exceptionHandlerType = exceptionHandlerType;
     this.sessionAccessorType = sessionAccessorType;
+    this.clientActionHandlerRegistryType = clientActionHandlerRegistryType;
   }
 
   @Override
   protected void configure() {
-    if (exceptionHandlerType == null) {
-      bind(ExceptionHandler.class).to(DefaultExceptionHandler.class);
-    } else {
-      bind(ExceptionHandler.class).to(exceptionHandlerType);
-    }
-
-    if (sessionAccessorType == null) {
-      bind(SecurityCookieAccessor.class).to(DefaultSecurityCookieAccessor.class);
-    } else {
-      bind(SecurityCookieAccessor.class).to(sessionAccessorType);
-    }
+    bind(ExceptionHandler.class).to(exceptionHandlerType);
+    bind(SecurityCookieAccessor.class).to(sessionAccessorType);
+    bind(ClientActionHandlerRegistry.class).to(clientActionHandlerRegistryType).asEagerSingleton();
   }
 
   @Provides
   @Singleton
   protected DispatchAsync provideDispatchAsync(
       ExceptionHandler exceptionHandler,
-      SecurityCookieAccessor secureSessionAccessor) {
-    return new DefaultDispatchAsync(exceptionHandler, secureSessionAccessor);
+      SecurityCookieAccessor secureSessionAccessor,
+      ClientActionHandlerRegistry registry) {
+    return new DefaultDispatchAsync(exceptionHandler, secureSessionAccessor,
+        registry);
   }
 }
