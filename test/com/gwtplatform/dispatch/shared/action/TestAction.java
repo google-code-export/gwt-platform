@@ -14,16 +14,33 @@
  * the License.
  */
 
-package com.gwtplatform.dispatch.server;
+package com.gwtplatform.dispatch.shared.action;
 
-import com.google.inject.Singleton;
-
-import java.security.SecureRandom;
+import com.gwtplatform.dispatch.shared.UnsecuredActionImpl;
 
 /**
- * @author Philippe Beaudoin
+ * @author Peter Simun
  */
-@Singleton
-public class SecureRandomSingleton extends SecureRandom {
-  private static final long serialVersionUID = 462441711297897572L;
+public class TestAction extends UnsecuredActionImpl<TestResult> {
+
+  private String testMessage;
+
+  /**
+   * Serialization purposes.
+   */
+  @SuppressWarnings("unused")
+  private TestAction() {
+  }
+
+  public TestAction(String testMessage) {
+    this.testMessage = testMessage;
+  }
+
+  public String getTestMessage() {
+    return testMessage;
+  }
+
+  public void setTestMessage(String testMessage) {
+    this.testMessage = testMessage;
+  }
 }

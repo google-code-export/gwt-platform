@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.gwtplatform.testing;
+package com.gwtplatform.test.mockito;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binding;
@@ -48,6 +48,7 @@ import java.lang.reflect.InvocationTargetException;
  * > http://cowwoc.blogspot.com/2008/10/integrating-google-guice-into-junit4.
  * html</a>
  * <p />
+ * Depends on Mockito.
  * 
  * @author Philippe Beaudoin
  */
