@@ -14,35 +14,20 @@
  * the License.
  */
 
-package com.gwtplatform.dispatch.client;
+package com.gwtplatform.dispatch.server.actionvalidator;
 
-import com.google.gwt.http.client.Request;
+import com.gwtplatform.dispatch.shared.Action;
+import com.gwtplatform.dispatch.shared.Result;
 
 /**
- * This is a common factory class that provides {@link DispatchRequest}.
+ * The default {@link ActionValidator} implementation. It'll accept every action.
  * 
  * @author Christian Goudreau
  */
-public class DispatchRequestFactory {
-  private static class RequestImpl implements DispatchRequest {
-    Request request;
+public class AbstractDefaultActionValidator implements ActionValidator {
 
-    private RequestImpl(Request request) {
-      this.request = request;
-    }
-
-    @Override
-    public void cancel() {
-      request.cancel();
-    }
-
-    @Override
-    public boolean isPending() {
-      return request.isPending();
-    }
-  }
-
-  public static DispatchRequest createRequest(Request request) {
-    return new RequestImpl(request);
+  @Override
+  public boolean isValid(Action<? extends Result> action) {
+    return true;
   }
 }

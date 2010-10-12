@@ -14,28 +14,18 @@
  * the License.
  */
 
-package com.gwtplatform.testing;
+package com.gwtplatform.dispatch.server.guice;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.binder.ScopedBindingBuilder;
+import com.gwtplatform.dispatch.server.actionhandler.TestActionHandler;
+import com.gwtplatform.dispatch.shared.action.TestAction;
 
 /**
- * A guice {@link AbstractModule} with a bit of syntactic sugar to bind within
- * typical test scopes.
- * 
  * @author Philippe Beaudoin
  */
-public abstract class TestModule extends AbstractModule {
+public class ActionModule extends HandlerModule {
 
-  /**
-   * Binds an interface to a mocked version of itself.
-   * 
-   * @param <T> The type of the interface to bind
-   * @param klass The class to bind
-   * @return A {@link ScopedBindingBuilder}.
-   */
-  protected <T> ScopedBindingBuilder bindMock(Class<T> klass) {
-    return bind(klass).toProvider(new MockProvider<T>(klass));
+  @Override
+  protected void configureHandlers() {
+    bindHandler(TestAction.class, TestActionHandler.class);
   }
-
 }

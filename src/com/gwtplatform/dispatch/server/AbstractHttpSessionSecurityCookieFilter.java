@@ -16,14 +16,7 @@
 
 package com.gwtplatform.dispatch.server;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-import com.gwtplatform.dispatch.shared.SecurityCookie;
-
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,48 +27,40 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
- * This filter will automatically inject a security cookie inside the request
- * the first time the page is loaded. This security cookie is a simple randomly
- * generated number, and might be slightly less secure than
- * {@link HttpSessionSecurityCookieFilter}, although it will work even if you
- * don't have access to an {@link javax.servlet.http.HttpSession}. To setup this
- * filter, add the following line at before any other {@code serve} call in your
- * own {@link com.google.inject.servlet.ServletModule#configureServlets}:
+ * This filter will automatically inject a security cookie inside the request the first time the page is loaded. This
+ * security cookie is based on the {@link HttpSession} and will only work if the session is enabled. To setup this
+ * filter, add the following line at before any other {@code serve} call in your own
+ * {@link com.google.inject.servlet.ServletModule#configureServlets}:
  * 
  * <pre>
- *     filter("*.jsp").through( HttpSessionSecurityCookieFilter.class );
+ * filter(&quot;*.jsp&quot;).through(HttpSessionSecurityCookieFilter.class);
  * </pre>
  * 
- * You also have to use a {@code .jsp} file instead of a {@code .html} as your
- * main GWT file.
+ * You also have to use a {@code .jsp} file instead of a {@code .html} as your main GWT file.
  * 
  * @author Philippe Beaudoin
  */
-@Singleton
-public class RandomSecurityCookieFilter implements Filter {
+public abstract class AbstractHttpSessionSecurityCookieFilter implements Filter {
 
-  private final SecureRandom random;
   private final String securityCookieName;
 
-  @Inject
-  RandomSecurityCookieFilter(@SecurityCookie String securityCookieName,
-      SecureRandomSingleton random) {
+  protected AbstractHttpSessionSecurityCookieFilter(String securityCookieName) {
     this.securityCookieName = securityCookieName;
-    this.random = random;
   }
 
   public void destroy() {
   }
 
-  public void doFilter(ServletRequest request, ServletResponse response,
-      FilterChain chain) throws IOException, ServletException {
+  protected abstract HttpSession getSession();
+
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
     if (request instanceof HttpServletRequest) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
-      Cookie securityCookie = new Cookie(securityCookieName, new BigInteger(
-          130, random).toString(32));
+      Cookie securityCookie = new Cookie(securityCookieName, getSession().getId());
       securityCookie.setMaxAge(-1);
       securityCookie.setPath("/");
       httpResponse.addCookie(securityCookie);
