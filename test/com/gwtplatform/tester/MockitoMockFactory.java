@@ -14,19 +14,18 @@
  * the License.
  */
 
-package com.gwtplatform.tester.mockito;
+package com.gwtplatform.tester;
 
-import com.google.inject.BindingAnnotation;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.mockito.Mockito;
 
 /**
- * An annotation used in a test class.
+ * Mock factory that use Mockito.
  * 
- * @author Philippe Beaudoin
- */
-@BindingAnnotation
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Value3 {
+* @author Christian Goudreau
+*/
+public class MockitoMockFactory implements MockFactory {
+  @Override
+  public <T> T mock(Class<T> classToMock) {
+    return Mockito.mock(classToMock);
+  }
 }

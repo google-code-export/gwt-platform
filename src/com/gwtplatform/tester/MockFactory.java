@@ -14,22 +14,23 @@
  * the License.
  */
 
-package com.gwtplatform.tester.mockito;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.gwtplatform.tester;
 
 /**
- * This annotation can be used on any classes that should be bound as
- * an mock within the {@link TestScope#SINGLETON} scope. It is meant to be 
- * used on inner static classes of the test class or its parents
- * and shouldn't be used on top-level classes.
+ * Mocking factory that transfer the work of creating a mock object to any
+ * Mocking framework. User should create an implementation to inject in their
+ * {@link MockingBinder} implementation.
  * 
- * @author Philippe Beaudoin
+ * <pre>
+ * public class MockitoMockFactory implements MockFactory {
+ *   public <T> T mock(Class<T> classToMock) {
+ *     return Mockito.mock(classToMock);
+ *   }
+ * }
+ * </pre>
+ * 
+ * @author Christian Goudreau
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TestMockSingleton {
+public interface MockFactory {
+  <T> T mock(Class<T> classToMock);
 }
