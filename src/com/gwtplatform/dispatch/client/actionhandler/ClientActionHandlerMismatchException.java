@@ -16,8 +16,6 @@
 
 package com.gwtplatform.dispatch.client.actionhandler;
 
-import com.gwtplatform.dispatch.shared.Action;
-
 /**
  * This exception is throw as a side-effect of an error calling
  * {@link DefaultClientActionHandlerRegistry#register()}. A provider was
@@ -32,17 +30,16 @@ public class ClientActionHandlerMismatchException extends RuntimeException {
 
   private static final long serialVersionUID = -2232006507185873458L;
   
-  private final Class<? extends Action<?>> requestedActionType;
+  private final Class<?> requestedActionType;
   private final Class<?> supportedActionType;
 
-  @SuppressWarnings("unchecked")
   public ClientActionHandlerMismatchException(
-      Class<? extends Action> requestedActionType, Class<?> supportedActionType) {
-    this.requestedActionType = (Class<? extends Action<?>>) requestedActionType;
+      Class<?> requestedActionType, Class<?> supportedActionType) {
+    this.requestedActionType = requestedActionType;
     this.supportedActionType = supportedActionType;
   }
 
-  public Class<? extends Action<?>> getRequestedActionType() {
+  public Class<?> getRequestedActionType() {
     return this.requestedActionType;
   }
 
