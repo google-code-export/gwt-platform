@@ -31,14 +31,29 @@ import com.google.gwt.dev.resource.ResourceOracle;
 import com.google.gwt.inject.client.GinModule;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
+import com.google.gwt.inject.rebind.adapter.GinModuleAdapter;
+import com.google.gwt.inject.rebind.util.KeyUtil;
 import com.google.gwt.uibinder.rebind.IndentedWriter;
 import com.google.gwt.uibinder.rebind.MortalLogger;
+import com.google.inject.Binding;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.ProvisionException;
+import com.google.inject.spi.DefaultElementVisitor;
+import com.google.inject.spi.Element;
+import com.google.inject.spi.Elements;
 
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The generator for {@link com.gwtplatform.mvp.client.ParameterizedGinjector ParameterizedGinjector}
@@ -56,11 +71,14 @@ public class ParameterizedGinjectorGenerator extends Generator {
   private JClassType ginjectorType;
   private JClassType gwtType;
   private JClassType annotationType;
+  
+  private KeyUtil keyUtil;
 
   @Override
   public String generate(TreeLogger logger, GeneratorContext genContext, String interfaceName) throws UnableToCompleteException {
     TypeOracle oracle = genContext.getTypeOracle();
     ResourceOracle resourceOracle = genContext.getResourcesOracle();
+    keyUtil = new KeyUtil(oracle, null, null);  // No need for a name generator in the methods we use
 
     JClassType interfaceType;
     try {
@@ -95,10 +113,12 @@ public class ParameterizedGinjectorGenerator extends Generator {
     String basicGinjectorTypeName = interfaceType.getName().replace('.', '_') + "BasicGinjector";
     
     // Copy the module annotation to the basic ginjector
-    GinModules declaredModules = interfaceType.getAnnotation(GinModules.class);
-    List<String> basicGinjectorModules = new ArrayList<String>(declaredModules.value().length);
-    for (Class<? extends GinModule> module : declaredModules.value()) {
-      basicGinjectorModules.add(module.getCanonicalName() + ".class");
+    List<Module> modules = new ArrayList<Module>();
+    Set<Class<? extends GinModule>> ginModules = new HashSet<Class<? extends GinModule>>();
+    populateModulesFromInjectorInterface(interfaceType, modules, ginModules, logger);
+    List<String> basicGinjectorModules = new ArrayList<String>(ginModules.size());
+    for (Class<? extends GinModule> ginModule : ginModules) {
+      basicGinjectorModules.add(ginModule.getCanonicalName() + ".class");
     }
     
     JMethod methods[] = interfaceType.getMethods();
@@ -107,7 +127,15 @@ public class ParameterizedGinjectorGenerator extends Generator {
     List<ParameterizedGinjectorMethod> parameterizedGinjectorMethods = identifyParameterizedGinjectorMethods(
         methods, logger, oracle);
 
-    // TODO Use Guice SPI to identify annotated bindings concerning bound types observed in parameterizedGinjectorMethods
+    Map<Class<?>, ParameterizedGinjectorMethod> bindingsOfInterest =
+        createBindingsOfInterest(parameterizedGinjectorMethods, logger);
+
+    // Use Guice SPI to identify annotated bindings concerning bound types observed in parameterizedGinjectorMethods
+    List<Element> elements = Elements.getElements(modules);
+    for (Element element : elements) {
+      LookForAnnotatedBindingVisitor visitor = new LookForAnnotatedBindingVisitor(bindingsOfInterest);
+      element.acceptVisitor(visitor);
+    }
     
     parameterizedGinjectorMethods.get(0);
     // Package
@@ -142,6 +170,17 @@ public class ParameterizedGinjectorGenerator extends Generator {
     // Close class
     writer.outdent();
     writer.write("}");    
+  }
+
+  private Map<Class<?>, ParameterizedGinjectorMethod> createBindingsOfInterest(
+      List<ParameterizedGinjectorMethod> parameterizedGinjectorMethods, 
+      MortalLogger logger) throws ProvisionException, UnableToCompleteException {
+    Map<Class<?>, ParameterizedGinjectorMethod> result = new HashMap<Class<?>, ParameterizedGinjectorMethod>();
+    for (ParameterizedGinjectorMethod method : parameterizedGinjectorMethods) {
+      Key<?> key = keyUtil.getKey(method.getBindingType(logger));
+      result.put(key.getTypeLiteral().getRawType(), method);
+    }
+    return result;
   }
 
   /**
@@ -250,6 +289,81 @@ public class ParameterizedGinjectorGenerator extends Generator {
     for (ParameterizedGinjectorMethod method : parameterizedGinjectorMethods) {
       method.writeImplementation(WRAPPED_GINJECTOR_FIELD_NAME, writer, logger);
     }    
+  }
+
+  /**
+   * Find all the gin modules annotating this interface and any parent interface.
+   * Copied from GIN source code.
+   */
+  private void populateModulesFromInjectorInterface(JClassType iface, List<Module> modules,
+      Set<Class<? extends GinModule>> added, MortalLogger logger) throws UnableToCompleteException {
+    GinModules gmodules = iface.getAnnotation(GinModules.class);
+    if (gmodules != null) {
+      for (Class<? extends GinModule> moduleClass : gmodules.value()) {
+        if (added.contains(moduleClass)) {
+          continue;
+        }
+
+        Module module = instantiateGModuleClass(moduleClass, logger);
+        if (module != null) {
+          modules.add(module);
+          added.add(moduleClass);
+        }
+      }
+    }
+
+    for (JClassType superIface : iface.getImplementedInterfaces()) {
+      populateModulesFromInjectorInterface(superIface, modules, added, logger);
+    }
+  }
+
+  private Module instantiateGModuleClass(Class<? extends GinModule> moduleClassName,
+      MortalLogger logger) throws UnableToCompleteException {
+    try {
+      Constructor<? extends GinModule> constructor = moduleClassName.getDeclaredConstructor();
+      try {
+        constructor.setAccessible(true);
+        return new GinModuleAdapter(constructor.newInstance());
+      } finally {
+        constructor.setAccessible(false);
+      }
+    } catch (IllegalAccessException e) {
+      logger.die("Error creating module: " + moduleClassName, e);
+    } catch (InstantiationException e) {
+      logger.die("Error creating module: " + moduleClassName, e);
+    } catch (NoSuchMethodException e) {
+      logger.die("Error creating module: " + moduleClassName, e);
+    } catch (InvocationTargetException e) {
+      logger.die("Error creating module: " + moduleClassName, e);
+    }
+
+    return null;
+  }
+  
+  /**
+   * A visitor only interested in elements that are bindings.
+   */
+  private class LookForAnnotatedBindingVisitor extends DefaultElementVisitor<Void> {
+    private final Map<Class<?>, ParameterizedGinjectorMethod> bindingsOfInterest;
+
+    public LookForAnnotatedBindingVisitor(
+        Map<Class<?>, ParameterizedGinjectorMethod> bindingsOfInterest) {
+      this.bindingsOfInterest = bindingsOfInterest;
+    }
+
+    @Override
+    public <T> Void visit(Binding<T> binding) {
+      Key<T> key = binding.getKey();
+      Annotation annotation = key.getAnnotation(); 
+      if (annotation != null) {
+        ParameterizedGinjectorMethod methodOfInterest =
+            bindingsOfInterest.get(key.getTypeLiteral().getRawType());
+        if (methodOfInterest != null) {
+          methodOfInterest.addBindingAnnotation(annotation);
+        }
+      }
+      return null;
+    }
   }
   
 }
