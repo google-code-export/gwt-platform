@@ -20,21 +20,24 @@ import org.springframework.beans.factory.FactoryBean;
 
 import java.util.logging.Logger;
 
-public class LoggerFactoryBean implements FactoryBean {
+/**
+ *
+ */
+public class LoggerFactoryBean implements FactoryBean<Logger> {
 
   private final Logger logger;
 
-  public LoggerFactoryBean(java.util.logging.Logger logger) {
+  public LoggerFactoryBean(Logger logger) {
     this.logger = logger;
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public Logger getObject() throws Exception {
     return logger;
   }
 
   @Override
-  public Class getObjectType() {
+  public Class<Logger> getObjectType() {
     return Logger.class;
   }
 
