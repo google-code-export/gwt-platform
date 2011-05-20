@@ -107,7 +107,7 @@
             <groupId>com.google.gwt.inject</groupId>
             <artifactId>gin</artifactId>
         </dependency>
-        
+
         <!-- TODO: Remove once we upgrade to newer version of GWT 
              See https://groups.google.com/forum/#!topic/codehaus-mojo-gwt-maven-plugin-users/X2yTJKMRnDA -->
         <dependency> 
@@ -122,7 +122,6 @@
             <version>1.0.0.GA</version> 
             <classifier>sources</classifier> 
             <scope>provided</scope> 
-        </dependency>
     </dependencies>
 
     <profiles>
