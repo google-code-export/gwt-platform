@@ -280,6 +280,22 @@
                         </execution>
                     </executions>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -354,8 +370,29 @@
                     <arguments>-Psonatype-oss-release -Prelease -Dgpg.passphrase=${gpg.passphrase}</arguments>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
+
+<dependencies>
+
+        <!-- TODO: Remove once we upgrade to newer version of GWT 
+             See https://groups.google.com/forum/#!topic/codehaus-mojo-gwt-maven-plugin-users/X2yTJKMRnDA -->
+        <dependency> 
+            <groupId>javax.validation</groupId> 
+            <artifactId>validation-api</artifactId> 
+            <version>1.0.0.GA</version> 
+            <scope>provided</scope> 
+        </dependency> 
+        <dependency> 
+            <groupId>javax.validation</groupId> 
+            <artifactId>validation-api</artifactId> 
+            <version>1.0.0.GA</version> 
+            <classifier>sources</classifier> 
+            <scope>provided</scope> 
+        </dependency>
+
+    </dependencies>
 
     <profiles>
         <profile>
@@ -370,20 +407,6 @@
                 <pluginManagement>
                 
                     <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-source-plugin</artifactId>
-                            <version>${maven-source-plugin.version}</version>
-                            <executions>
-                                <execution>
-                                    <id>attach-sources</id>
-                                    <goals>
-                                        <goal>jar-no-fork</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-                        
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-javadoc-plugin</artifactId>
