@@ -1,0 +1,482 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>5</version>
+    </parent>
+
+    <groupId>com.gwtplatform</groupId>
+    <artifactId>gwtp</artifactId>
+    <version>0.7-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>GWT-Platform</name>
+    <inceptionYear>2010</inceptionYear>
+    <description>A complete model-view-presenter framework to simplify your next GWT project.</description>
+    <url>http://gwtplatform.com</url>
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>ArcBees</name>
+        <url>http://arcbees.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>philippe.beaudoin</id>
+            <name>Philippe Beaudoin</name>
+            <email>philippe.beaudoin@gmail.com</email>
+            <organization>ArcBees</organization>
+            <organizationUrl>http://arcbees.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>lead developer</role>
+            </roles>
+            <timezone>-5</timezone>
+            <properties>
+                <picUrl>http://goo.gl/xV2K8</picUrl>
+            </properties>
+        </developer>
+        <developer>
+            <id>goudreau.christian</id>
+            <name>Christain Goudreau</name>
+            <email>goudreau.christian@gmail.com</email>
+            <organization>ArcBees</organization>
+            <organizationUrl>http://arcbees.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>-5</timezone>
+        </developer>
+        <developer>
+            <id>brendanpdoherty</id>
+            <name>Brendan Doherty</name>
+            <email>brendan@doherty.net.nz</email>
+        </developer>
+        <developer>
+            <name>Yannis Gonianakis</name>
+            <email>jgonian@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Yannis Gonianakis</name>
+            <email>jgonian@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Michael Renaud</name>
+            <email>michael.renaud@imagemsoft.com</email>
+        </developer>
+	</developers>
+
+    <contributors>
+        <contributor>
+            <name>Olivier Monaco</name>
+            <email>monaco.olivier@gmail.com</email>
+        </contributor>
+        <contributor>
+            <name>Gene Conroy-Jones</name>
+            <email>drgenejones@gmail.com</email>
+        </contributor>
+        <contributor>
+            <name>Raphael André Bauer</name>
+            <email>raphael.andre.bauer@gmail.com</email>
+        </contributor>
+        <contributor>
+            <name>Jian Jiang</name>
+            <email>youarehow2@gmail.com</email>
+        </contributor>
+        <contributor>
+            <name>Peter Simun</name>
+            <email>Peter.Simun@seges.sk</email>
+        </contributor>
+        <contributor>
+            <name>David Peterson</name>
+            <email>david.peterson@customware.net</email>
+        </contributor>
+        <contributor>
+            <name>David M. Chandler</name>
+            <email>david@turbomanage.com</email>
+        </contributor>
+        <contributor>
+            <name>Chema Molins</name>
+            <email>chemamolins@gmail.com</email>
+        </contributor>
+        <contributor>
+            <name>Bailey Cosier</name>
+            <email>bailey@cosier.org</email>
+        </contributor>
+        <contributor>
+            <name>Florian Sauter</name>
+            <email>floonweb@gmail.com</email>
+        </contributor>
+        <contributor>
+            <name>Denis Labaye</name>
+            <email>denis.labaye@gmail.com</email>
+        </contributor>
+        <contributor>
+            <name>Travis Camechis</name>
+            <email>camechis@gmail.com</email>
+        </contributor>
+    </contributors>
+
+    <scm>
+        <connection>scm:hg:http://gwt-platform.googlecode.com/hg/</connection>
+        <developerConnection>scm:hg:https://gwt-platform.googlecode.com/hg/</developerConnection>
+        <url>http://code.google.com/p/gwt-platform/source/browse/</url>
+    </scm>
+
+    <issueManagement>
+      <system>Google Code</system>
+      <url>http://code.google.com/p/gwt-platform/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+      <system>Team City</system>
+      <url>http://teamcity.codebetter.com</url>
+    </ciManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>Development</name>
+            <subscribe>gwt-platform+subscribe@googlegroups.com</subscribe>
+            <unsubscribe>gwt-platform+unsubscribe@googlegroups.com</unsubscribe>
+            <post>gwt-platform@googlegroups.com</post>
+            <archive>http://groups.google.com/group/gwt-platform</archive>
+        </mailingList>
+    </mailingLists>
+
+    <modules>
+        <module>gwtp-build-tools</module>
+        <module>gwtp-core</module>
+        <module>gwtp-samples</module>
+    </modules>
+
+    <properties>
+        <target.jdk>1.6</target.jdk>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <gwt-maven-plugin.version>2.2.0</gwt-maven-plugin.version>
+        <maven-checkstyle-plugin.version>2.6</maven-checkstyle-plugin.version>
+        <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+        <maven-deploy-plugin.version>2.5</maven-deploy-plugin.version>
+        <maven-eclipse-plugin.version>2.8</maven-eclipse-plugin.version>
+        <maven-javadoc-plugin.version>2.5</maven-javadoc-plugin.version> <!-- More recent versions fail -->
+        <maven-processor-plugin.version>2.0.1</maven-processor-plugin.version>
+        <maven-release-plugin.version>2.1</maven-release-plugin.version>
+        <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
+        <maven-surefire-plugin.version>2.6</maven-surefire-plugin.version>
+
+        <gae.version>1.5.0</gae.version>
+        <gin.version>1.5.0</gin.version>
+        <guice.version>3.0</guice.version>
+        <aopalliance.version>1.0</aopalliance.version>
+        <gwt.version>2.3.0</gwt.version>
+        <junit.version>4.5</junit.version>
+        <jukito.version>1.1</jukito.version>
+        <mockito.version>1.8.5</mockito.version>
+        <spring.version>3.0.5.RELEASE</spring.version>
+        <cglib.version>2.2</cglib.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <javax.inject.version>1</javax.inject.version>
+        <htmlunit.version>2.8</htmlunit.version>
+        <objectify.version>2.2.3</objectify.version>
+        <persistence-api.version>1.0</persistence-api.version>
+    </properties>
+
+    <repositories>
+<!-- Uncomment when we depend on dependencies only released on our repository
+        <repository>
+            <id>Custom Compiled dependencies</id>
+            <url>http://maven.gwt-platform.googlecode.com/hg</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+-->
+<!-- Uncomment when we depend on snapshots released on sonatype -->
+
+        <repository>
+            <id>sonatype.snapshots</id>
+            <name>Sonatype snapshot repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+	</repositories>
+
+    <pluginRepositories>
+        <!-- To use maven-processor-plugin -->
+        <pluginRepository>
+            <id>maven-annotation-plugin</id>
+            <url>http://maven-annotation-plugin.googlecode.com/svn/trunk/mavenrepo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>${target.jdk}</source>
+                        <target>${target.jdk}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>${maven-processor-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven-checkstyle-plugin.version}</version>
+                    <configuration>
+                        <configLocation>/gwtp-checkstyle.xml</configLocation>
+                        <headerLocation>/gwtp-java-header.txt</headerLocation>
+                        <suppressionsLocation>/gwtp-suppressions.xml</suppressionsLocation>
+                        <propertiesLocation>/gwtp-checkstyle.properties</propertiesLocation>
+                        <propertyExpansion>basedir=${project.basedir}</propertyExpansion>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                        <linkXRef>false</linkXRef>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.gwtplatform</groupId>
+                            <artifactId>gwtp-build-tools</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>checkstyle</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+
+        <!-- Plugins to be inherited by sub-projects. Note that definitions 
+            and configurations of the following plugins in a sub module, will override 
+            the top level parent pom's definition -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${target.jdk}</source>
+                    <target>${target.jdk}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*TestCase.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/*GwtTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>${maven-eclipse-plugin.version}</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                    <wtpversion>2.0</wtpversion>
+                    <additionalBuildcommands>
+                        <buildcommand>net.sf.eclipsecs.core.CheckstyleBuilder</buildcommand>
+                    </additionalBuildcommands>
+                    <additionalProjectnatures>
+                        <projectnature>net.sf.eclipsecs.core.CheckstyleNature</projectnature>
+                    </additionalProjectnatures>
+                    <additionalConfig>
+                        <file>
+                            <name>.checkstyle</name>
+                            <location>/gwtp-eclipse-checkstyle.xml</location>
+                        </file>
+                    </additionalConfig>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.gwtplatform</groupId>
+                        <artifactId>gwtp-build-tools</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <arguments>-Psonatype-oss-release -Prelease -Dgpg.passphrase=${gpg.passphrase}</arguments>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+<dependencies>
+
+        <!-- TODO: Remove once we upgrade to newer version of GWT 
+             See https://groups.google.com/forum/#!topic/codehaus-mojo-gwt-maven-plugin-users/X2yTJKMRnDA -->
+        <dependency> 
+            <groupId>javax.validation</groupId> 
+            <artifactId>validation-api</artifactId> 
+            <version>1.0.0.GA</version> 
+            <scope>provided</scope> 
+        </dependency> 
+        <dependency> 
+            <groupId>javax.validation</groupId> 
+            <artifactId>validation-api</artifactId> 
+            <version>1.0.0.GA</version> 
+            <classifier>sources</classifier> 
+            <scope>provided</scope> 
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>${maven-javadoc-plugin.version}</version>
+                            <executions>
+                                <execution>
+                                    <id>attach-javadocs</id>
+                                    <goals>
+                                        <goal>jar</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <source>${target.jdk}</source>
+                                <failOnError>true</failOnError>
+                                <quiet>true</quiet>
+                                <links>
+                                    <link>http://download.oracle.com/javase/6/docs/api/</link>
+                                    <link>http://google-web-toolkit.googlecode.com/svn/javadoc/2.0/</link>
+                                    <link>http://static.springsource.org/spring/docs/3.0.x/javadoc-api/</link>
+                                    <link>http://google-gin.googlecode.com/svn/trunk/javadoc/</link>
+                                    <link>http://google-guice.googlecode.com/svn/trunk/javadoc/</link>
+                                    <link>http://aopalliance.sourceforge.net/doc/</link>
+                                </links>
+                            </configuration>
+                        </plugin>
+                        
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-gpg-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>sign-artifacts</id>
+                                    <phase>verify</phase>
+                                    <goals>
+                                        <goal>sign</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+</project>
