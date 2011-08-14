@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -20,19 +20,17 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
-
 import com.gwtplatform.mvp.client.Presenter;
 
 /**
  * A useful mixing class to define a {@link Proxy} that is also a {@link Place}.
  * You can usually inherit from the simpler form {@link ProxyPlace}.
  * <p />
- * 
+ *
  * @param <P> The Presenter's type.
  * @param <Proxy_> Type of the associated {@link Proxy}.
- * 
+ *
  * @author David Peterson
  * @author Philippe Beaudoin
  * @author Christian Goudreau
@@ -40,11 +38,10 @@ import com.gwtplatform.mvp.client.Presenter;
 public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<P>>
     implements ProxyPlace<P> {
 
-  protected ProxyFailureHandler failureHandler;
   protected Place place;
   protected PlaceManager placeManager;
   protected Proxy_ proxy;
-  
+
   private EventBus eventBus;
 
   /**
@@ -88,12 +85,12 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
   // Inherited from Place
 
   @Override
-  public void getPresenter(AsyncCallback<P> callback) {
+  public void getPresenter(NotifyingAsyncCallback<P> callback) {
     proxy.getPresenter(callback);
   }
 
   @Override
-  public void getRawPresenter(AsyncCallback<Presenter<?, ?>> callback) {
+  public void getRawPresenter(NotifyingAsyncCallback<Presenter<?, ?>> callback) {
     proxy.getRawPresenter(callback);
   }
 
@@ -124,15 +121,12 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
    * Never call directly, it should only be called by GIN. Method injection is
    * used instead of constructor injection, because the latter doesn't work well
    * with GWT generators.
-   * 
-   * @param failureHandler The {@link ProxyFailureHandler}.
+   *
    * @param placeManager The {@link PlaceManager}.
    * @param eventBus The {@link EventBus}.
    */
   @Inject
-  protected void bind(ProxyFailureHandler failureHandler,
-      final PlaceManager placeManager, EventBus eventBus) {
-    this.failureHandler = failureHandler;
+  protected void bind(final PlaceManager placeManager, EventBus eventBus) {
     this.eventBus = eventBus;
     this.placeManager = placeManager;
     eventBus.addHandler(PlaceRequestInternalEvent.getType(),
@@ -146,7 +140,7 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
             if (matchesRequest(request)) {
               event.setHandled();
               if (canReveal()) {
-                handleRequest(request);
+                handleRequest(request, event.shouldUpdateBrowserHistory());
               } else {
                 event.setUnauthorized();
               }
@@ -176,7 +170,7 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
    * title is available. By default, places don't have a title and will invoke
    * the handler with {@code null}, but override this method to provide your own
    * title.
-   * 
+   *
    * @param event The {@link GetPlaceTitleEvent} to invoke once the title is
    *          available.
    */
@@ -188,21 +182,18 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
    * Prepares the presenter with the information contained in the current
    * request, then reveals it. Will refuse to reveal the display and do nothing
    * if {@link #canReveal()} returns <code>false</code>.
-   * 
+   *
    * @param request The request to handle. Can pass <code>null</code> if no
    *          request is used, in which case the presenter will be directly
    *          revealed.
+   * @param updateBrowserUrl {@code true} If the browser URL should be updated, {@code false}
+   *          otherwise.
    */
-  private void handleRequest(final PlaceRequest request) {
-    proxy.getPresenter(new AsyncCallback<P>() {
+  private void handleRequest(final PlaceRequest request, final boolean updateBrowserUrl) {
+    proxy.getPresenter(new NotifyingAsyncCallback<P>(eventBus) {
 
       @Override
-      public void onFailure(Throwable caught) {
-        failureHandler.onFailedGetPresenter(caught);
-      }
-
-      @Override
-      public void onSuccess(final P presenter) {
+      public void success(final P presenter) {
         // Everything should be bound before we prepare the presenter from the
         // request,
         // in case it wants to fire some events. That's why we will do this in a
@@ -214,7 +205,7 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
             presenter.prepareFromRequest(request);
             if (originalRequest == placeManager.getCurrentPlaceRequest()) {
               // User did not manually update place request in prepareFromRequest, update it here.
-              placeManager.updateHistory(request);
+              placeManager.updateHistory(request, updateBrowserUrl);
             }
             NavigationEvent.fire(placeManager, request);
             if (!presenter.useManualReveal()) {
@@ -230,7 +221,7 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
   @Override
   public void manualReveal(Presenter<?, ?> presenter) {
     // Reveal only if there are no pending navigation requests
-    if (!placeManager.hasPendingNavigation()) {    
+    if (!placeManager.hasPendingNavigation()) {
       if (!presenter.isVisible()) {
         // This will trigger a reset in due time
         presenter.forceReveal();
@@ -250,11 +241,11 @@ public class ProxyPlaceAbstract<P extends Presenter<?, ?>, Proxy_ extends Proxy<
   /**
    * This method allows unit test to handle deferred command with a mechanism that doesn't
    * require a GWTTestCase.
-   * 
+   *
    * @param command The {@Command} to defer, see {@link DeferredCommand}.
    */
   void addDeferredCommand(Command command) {
     Scheduler.get().scheduleDeferred(command);
   }
-  
+
 }

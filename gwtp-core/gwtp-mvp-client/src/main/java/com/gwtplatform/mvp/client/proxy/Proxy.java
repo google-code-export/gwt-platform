@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,8 +17,6 @@
 package com.gwtplatform.mvp.client.proxy;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import com.gwtplatform.mvp.client.Presenter;
 
 /**
@@ -31,9 +29,9 @@ import com.gwtplatform.mvp.client.Presenter;
  * <p />
  * {@link Presenter} subclasses will usually define their own interface called
  * MyProxy and be derived from this one.
- * 
+ *
  * @param <P> The type of the {@link Presenter} associated with this proxy.
- * 
+ *
  * @author Philippe Beaudoin
  */
 public interface Proxy<P extends Presenter<?, ?>> extends ProxyRaw {
@@ -41,18 +39,18 @@ public interface Proxy<P extends Presenter<?, ?>> extends ProxyRaw {
   /**
    * Makes it possible to access the {@link EventBus} object associated with
    * that proxy.
-   * 
+   *
    * @return The {@link EventBus} associated with that proxy.
    */
   EventBus getEventBus();
-  
+
   /**
    * Get the associated {@link Presenter}. The presenter can only be obtained in
    * an asynchronous manner to support code splitting when needed. To access the
    * presenter, pass a callback.
-   * 
+   *
    * @param callback The callback in which the {@link Presenter} will be passed
    *          as a parameter.
    */
-  void getPresenter(AsyncCallback<P> callback);
+  void getPresenter(NotifyingAsyncCallback<P> callback);
 }

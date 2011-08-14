@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,7 +16,9 @@
 
 package com.gwtplatform.mvp.client.proxy;
 
-import com.google.gwt.core.client.Scheduler;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -28,12 +30,9 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This is the default implementation of the {@link PlaceManager}.
- * 
+ *
  * @author Philippe Beaudoin
  * @author Christian Goudreau
  */
@@ -43,11 +42,9 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   private final EventBus eventBus;
   private String currentHistoryToken = "";
 
-  private String currentHRef = "";
   private boolean internalError;
   private String onLeaveQuestion;
   private List<PlaceRequest> placeHierarchy = new ArrayList<PlaceRequest>();
-  private String previousHistoryToken;
 
   private final TokenFormatter tokenFormatter;
 
@@ -57,7 +54,7 @@ public abstract class PlaceManagerImpl implements PlaceManager,
 
   public PlaceManagerImpl(EventBus eventBus, TokenFormatter tokenFormatter) {
     this.eventBus = eventBus;
-    this.tokenFormatter = tokenFormatter;    
+    this.tokenFormatter = tokenFormatter;
     registerTowardsHistory();
   }
 
@@ -68,7 +65,7 @@ public abstract class PlaceManagerImpl implements PlaceManager,
 
   @Override
   public String buildRelativeHistoryToken(int level) {
-    List<PlaceRequest> placeHierarchyCopy = updatePlaceHierarchy(level);
+    List<PlaceRequest> placeHierarchyCopy = truncatePlaceHierarchy(level);
     if (placeHierarchyCopy.size() == 0) {
       return "";
     }
@@ -82,15 +79,16 @@ public abstract class PlaceManagerImpl implements PlaceManager,
 
   @Override
   public String buildRelativeHistoryToken(PlaceRequest request, int level) {
-    List<PlaceRequest> placeHierarchyCopy = updatePlaceHierarchy(level);
+    List<PlaceRequest> placeHierarchyCopy = truncatePlaceHierarchy(level);
     placeHierarchyCopy.add(request);
     return tokenFormatter.toHistoryToken(placeHierarchyCopy);
   }
 
   /**
-   * If a confirmation question is set (see {@link #setOnLeaveConfirmation(String)}),
-   * this asks the user if he wants to leave the current page.
-   * 
+   * If a confirmation question is set (see
+   * {@link #setOnLeaveConfirmation(String)}), this asks the user if he wants to
+   * leave the current page.
+   *
    * @return true if the user accepts to leave. false if he refuses.
    */
   private boolean confirmLeaveState() {
@@ -110,16 +108,19 @@ public abstract class PlaceManagerImpl implements PlaceManager,
 
   /**
    * Fires the {@link PlaceRequestInternalEvent} for the given
-   * {@link PlaceRequest}.
-   * 
+   * {@link PlaceRequest}. Do not call this method directly,
+   * instead call {@link #revealPlace(PlaceRequest)} or a related method.
+   *
    * @param request The {@link PlaceRequest} to fire.
+   * @param updateBrowserUrl {@code true} If the browser URL should be updated, {@code false}
+   *          otherwise.
    */
-  private void doRevealPlace(PlaceRequest request) {
-    PlaceRequestInternalEvent requestEvent = new PlaceRequestInternalEvent(
-        request);
+  protected void doRevealPlace(PlaceRequest request, boolean updateBrowserUrl) {
+    PlaceRequestInternalEvent requestEvent = new PlaceRequestInternalEvent(request,
+        updateBrowserUrl);
     fireEvent(requestEvent);
     if (!requestEvent.isHandled()) {
-      unlock();      
+      unlock();
       error(tokenFormatter.toHistoryToken(placeHierarchy));
     } else if (!requestEvent.isAuthorized()) {
       unlock();
@@ -128,14 +129,13 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   /**
-   * Called whenever an error occurred that requires the error page
-   * to be shown to the user.
-   * This method will detect infinite reveal loops and throw an
+   * Called whenever an error occurred that requires the error page to be shown
+   * to the user. This method will detect infinite reveal loops and throw an
    * {@link RuntimeException} in that case.
-   * 
+   *
    * @param invalidHistoryToken The history token that was not recognised.
    */
-  private void error(String invalidHistoryToken) {   
+  private void error(String invalidHistoryToken) {
     startError();
     revealErrorPlace(invalidHistoryToken);
     stopError();
@@ -150,10 +150,6 @@ public abstract class PlaceManagerImpl implements PlaceManager,
     return History.getToken();
   }
 
-  String getCurrentHref() {
-    return Window.Location.getHref();
-  }
-
   @Override
   public List<PlaceRequest> getCurrentPlaceHierarchy() {
     return placeHierarchy;
@@ -164,7 +160,7 @@ public abstract class PlaceManagerImpl implements PlaceManager,
     try {
       return placeHierarchy.get(placeHierarchy.size() - 1);
     } catch (ArrayIndexOutOfBoundsException e) {
-        return new PlaceRequest();
+      return new PlaceRequest();
     }
   }
 
@@ -172,7 +168,7 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   public void getCurrentTitle(SetPlaceTitleHandler handler) {
     getTitle(placeHierarchy.size() - 1, handler);
   }
-  
+
   @Override
   public EventBus getEventBus() {
     return eventBus;
@@ -184,11 +180,11 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   /**
-   * Checks that the place manager is not locked and that the user allows
-   * the application to navigate (see {@link #confirmLeaveState()}. If the
+   * Checks that the place manager is not locked and that the user allows the
+   * application to navigate (see {@link #confirmLeaveState()}. If the
    * application is allowed to navigate, this method locks navigation.
-   * 
-   * @return true if the place manager can get the lock false otherwise. 
+   *
+   * @return true if the place manager can get the lock false otherwise.
    */
   private boolean getLock() {
     if (locked) {
@@ -219,14 +215,14 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   /**
-   * Called whenever the user tries to access an page to which he doesn't
-   * have access, and we need to reveal the user-defined unauthorized place.
-   * This method will detect infinite reveal loops and throw an
+   * Called whenever the user tries to access an page to which he doesn't have
+   * access, and we need to reveal the user-defined unauthorized place. This
+   * method will detect infinite reveal loops and throw an
    * {@link RuntimeException} in that case.
-   * 
+   *
    * @param historyToken The history token that was not recognised.
    */
-  private void illegalAccess(String historyToken) {   
+  private void illegalAccess(String historyToken) {
     startError();
     revealUnauthorizedPlace(historyToken);
     stopError();
@@ -240,19 +236,15 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   @Override
-  public final void navigateBack() {
-    if (previousHistoryToken != null) {
-      setBrowserHistoryToken(previousHistoryToken, true);
-    } else {
-      revealDefaultPlace();
-    }
+  public void navigateBack() {
+    History.back();
   }
 
   /**
    * Handles change events from {@link History}.
    */
   @Override
-  public final void onValueChange(final ValueChangeEvent<String> event) {
+  public void onValueChange(final ValueChangeEvent<String> event) {
     if (locked) {
       defferedNavigation = new Command() {
         @Override
@@ -272,7 +264,7 @@ public abstract class PlaceManagerImpl implements PlaceManager,
         revealDefaultPlace();
       } else {
         placeHierarchy = tokenFormatter.toPlaceRequestHierarchy(historyToken);
-        doRevealPlace(getCurrentPlaceRequest());
+        doRevealPlace(getCurrentPlaceRequest(), true);
       }
     } catch (TokenFormatException e) {
       unlock();
@@ -282,14 +274,31 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   @Override
-  public final void onWindowClosing(ClosingEvent event) {
+  public void onWindowClosing(ClosingEvent event) {
+    // The current implementation has a few bugs described below. However these are browser
+    // bugs, and the workarounds we've experimented with gave worst results than the bug itself.
+    //
+    // Here are the current behaviours of different browsers after cancelling navigation
+    // * Chrome
+    //    - URL bar shows new website (FAIL)
+    //    - Bookmarking uses the title of the webapp, but url of new website (FAIL)
+    //    - Navigating away and then back goes back to the correct webapp page (WORKS)
+    // * Firefox
+    //    - URL bar shows new website (FAIL)
+    //    - Bookmarking uses the title of the webapp, and url of webapp (WORKS)
+    //    - Navigating away and then back goes back to the correct webapp page (WORKS)
+    // * IE
+    //    - Untested
+    //
+    // Options are to report that upstream in the browsers or to go back to our workarounds in a
+    // browser-dependent fashion using deferred binding. The workarounds we've experimented with
+    // consisted of adding a deferred command that used Window.Location.replace to reset the URL
+    // to the current page. However, this caused infinite loops in some browsers.
+    //
+    // See this issue:
+    //   http://code.google.com/p/gwt-platform/issues/detail?id=315
+
     event.setMessage(onLeaveQuestion);
-    Scheduler.get().scheduleDeferred(new Command() {
-      @Override
-      public void execute() {
-        Window.Location.replace(currentHRef);
-      }
-    });
   }
 
   void registerTowardsHistory() {
@@ -300,14 +309,19 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   public void revealCurrentPlace() {
     History.fireCurrentHistoryState();
   }
-  
+
   @Override
   public void revealErrorPlace(String invalidHistoryToken) {
     revealDefaultPlace();
   }
 
   @Override
-  public final void revealPlace(final PlaceRequest request) {
+  public void revealPlace(final PlaceRequest request) {
+    revealPlace(request, true);
+  }
+
+  @Override
+  public void revealPlace(final PlaceRequest request, boolean updateBrowserUrl) {
     if (locked) {
       defferedNavigation = new Command() {
         @Override
@@ -322,11 +336,11 @@ public abstract class PlaceManagerImpl implements PlaceManager,
     }
     placeHierarchy.clear();
     placeHierarchy.add(request);
-    doRevealPlace(request);
+    doRevealPlace(request, updateBrowserUrl);
   }
 
   @Override
-  public final void revealPlaceHierarchy(
+  public void revealPlaceHierarchy(
       final List<PlaceRequest> placeRequestHierarchy) {
     if (locked) {
       defferedNavigation = new Command() {
@@ -344,10 +358,10 @@ public abstract class PlaceManagerImpl implements PlaceManager,
       revealDefaultPlace();
     } else {
       placeHierarchy = placeRequestHierarchy;
-      doRevealPlace(getCurrentPlaceRequest());
+      doRevealPlace(getCurrentPlaceRequest(), true);
     }
   }
-  
+
   @Override
   public void revealRelativePlace(final int level) {
     if (locked) {
@@ -362,13 +376,13 @@ public abstract class PlaceManagerImpl implements PlaceManager,
     if (!getLock()) {
       return;
     }
-    placeHierarchy = updatePlaceHierarchy(level);
+    placeHierarchy = truncatePlaceHierarchy(level);
     int hierarchySize = placeHierarchy.size();
     if (hierarchySize == 0) {
       revealDefaultPlace();
     } else {
       PlaceRequest request = placeHierarchy.get(hierarchySize - 1);
-      doRevealPlace(request);
+      doRevealPlace(request, true);
     }
   }
 
@@ -391,9 +405,9 @@ public abstract class PlaceManagerImpl implements PlaceManager,
     if (!getLock()) {
       return;
     }
-    placeHierarchy = updatePlaceHierarchy(level);
+    placeHierarchy = truncatePlaceHierarchy(level);
     placeHierarchy.add(request);
-    doRevealPlace(request);
+    doRevealPlace(request, true);
   }
 
   @Override
@@ -402,16 +416,13 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   /**
-   * This method saves the history token, allowing the {@link #navigateBack()} method to
-   * be used and making it possible to correctly restore the browser's URL if the
-   * user refuses to navigate. (See {@link #onWindowClosing(ClosingEvent)})
-   * 
+   * This method saves the history token, making it possible to correctly restore the browser's
+   * URL if the user refuses to navigate. (See {@link #onWindowClosing(ClosingEvent)})
+   *
    * @param historyToken The current history token, a string.
    */
   private void saveHistoryToken(String historyToken) {
-    previousHistoryToken = currentHistoryToken;
     currentHistoryToken = historyToken;
-    currentHRef = getCurrentHref();
   }
 
   void setBrowserHistoryToken(String historyToken, boolean issueEvent) {
@@ -419,7 +430,7 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   @Override
-  public final void setOnLeaveConfirmation(String question) {
+  public void setOnLeaveConfirmation(String question) {
     if (question == null && onLeaveQuestion == null) {
       return;
     }
@@ -433,25 +444,25 @@ public abstract class PlaceManagerImpl implements PlaceManager,
   }
 
   /**
-   * Start revealing an error or unauthorized page. This method will
-   * throw an exception if an infinite loop is detected.
-   * 
+   * Start revealing an error or unauthorized page. This method will throw an
+   * exception if an infinite loop is detected.
+   *
    * @see #stopError()
    */
   private void startError() {
     if (this.internalError) {
       throw new RuntimeException(
-          "Encountered repeated errors resulting in an infinite loop. Make sure all users have access " +
-          "to the pages revealed by revealErrorPlace and revealUnauthorizedPlace. (Note that the default " +
-          "implementations call revealDefaultPlace)");
+          "Encountered repeated errors resulting in an infinite loop. Make sure all users have access "
+              + "to the pages revealed by revealErrorPlace and revealUnauthorizedPlace. (Note that the default "
+              + "implementations call revealDefaultPlace)");
     }
     internalError = true;
   }
 
   /**
-   * Indicates that an error page has successfully been revealed. Makes it possible
-   * to detect infinite loops.
-   * 
+   * Indicates that an error page has successfully been revealed. Makes it
+   * possible to detect infinite loops.
+   *
    * @see #startError()
    */
   private void stopError() {
@@ -470,35 +481,37 @@ public abstract class PlaceManagerImpl implements PlaceManager,
       }
     }
   }
-  
+
   @Override
-  public void updateHistory(PlaceRequest request) {
+  public void updateHistory(PlaceRequest request, boolean updateBrowserUrl) {
     try {
       // Make sure the request match
       assert request.hasSameNameToken(getCurrentPlaceRequest()) : "Internal error, PlaceRequest passed to updateHistory doesn't match the tail of the place hierarchy.";
       placeHierarchy.set(placeHierarchy.size() - 1, request);
-      String historyToken = tokenFormatter.toHistoryToken(placeHierarchy);
-      String browserHistoryToken = getBrowserHistoryToken();
-      if (browserHistoryToken == null
-          || !browserHistoryToken.equals(historyToken)) {
-        setBrowserHistoryToken(historyToken, false);
+      if (updateBrowserUrl) {
+        String historyToken = tokenFormatter.toHistoryToken(placeHierarchy);
+        String browserHistoryToken = getBrowserHistoryToken();
+        if (browserHistoryToken == null
+            || !browserHistoryToken.equals(historyToken)) {
+          setBrowserHistoryToken(historyToken, false);
+        }
         saveHistoryToken(historyToken);
-      }      
+      }
     } catch (TokenFormatException e) {
       // Do nothing.
     }
   }
- 
+
   /**
    * Returns a modified copy of the place hierarchy based on the specified
    * {@code level}.
-   * 
+   *
    * @param level If negative, take back that many elements from the tail of the
    *          hierarchy. If positive, keep only that many elements from the head
    *          of the hierarchy. Passing {@code 0} leaves the hierarchy
    *          untouched.
    */
-  private List<PlaceRequest> updatePlaceHierarchy(int level) {
+  private List<PlaceRequest> truncatePlaceHierarchy(int level) {
     int size = placeHierarchy.size();
     if (level < 0) {
       if (-level >= size) {

@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.gwtplatform</groupId>
         <artifactId>gwtp-core</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.7-SNAPSHOT</version>
     </parent>
 
     <groupId>com.gwtplatform</groupId>
@@ -114,9 +114,13 @@
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-user</artifactId>
         </dependency>
+
+        <!-- Needed for @BindingAnnotation in SecurityCookie, can safely be ignored when using Spring -->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Test dependencies -->

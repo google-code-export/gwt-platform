@@ -48,3 +48,7 @@ glob:gwtp-samples/gwtp-sample-basic-spring/bin/**
 glob:gwtp-samples/gwtp-sample-hplace/bin/**
 glob:gwtp-samples/gwtp-sample-nested/bin/**
 glob:gwtp-samples/gwtp-sample-tab/bin/**
+glob:**/bin/**
+glob:**/.gwt
+glob:**/manifest.txt
+

@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,21 +16,14 @@
 
 package com.gwtplatform.samples.tab.client.gin;
 
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.AsyncProvider;
 import com.google.gwt.inject.client.GinModules;
-import com.google.gwt.inject.client.Ginjector;
-import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.ProxyFailureHandler;
-import com.gwtplatform.samples.tab.client.IsAdminGatekeeper;
 import com.gwtplatform.samples.tab.client.MyConstants;
 import com.gwtplatform.samples.tab.client.presenter.AdminAreaPresenter;
 import com.gwtplatform.samples.tab.client.presenter.DialogSamplePresenter;
 import com.gwtplatform.samples.tab.client.presenter.HomeInfoPresenter;
 import com.gwtplatform.samples.tab.client.presenter.HomeNewsPresenter;
-import com.gwtplatform.samples.tab.client.presenter.HomePresenter;
-import com.gwtplatform.samples.tab.client.presenter.MainPagePresenter;
 import com.gwtplatform.samples.tab.client.presenter.SettingsPresenter;
 import com.gwtplatform.samples.tab.client.ui.LinkMenu;
 import com.gwtplatform.samples.tab.client.ui.RoundTabPanel;
@@ -38,26 +31,21 @@ import com.gwtplatform.samples.tab.client.ui.SimpleTabPanel;
 import com.gwtplatform.samples.tab.client.ui.UiModule;
 
 /**
- * The main {@link Ginjector} of our application.
- * 
+ * The main {@link com.google.gwt.inject.client.Ginjector Ginjector} of our application.
+ *
  * @author Christian Goudreau
  * @author Philippe Beaudoin
  */
 @GinModules({ClientModule.class, UiModule.class})
-public interface ClientGinjector extends Ginjector {
-  AsyncProvider<DialogSamplePresenter> getAboutUsPresenter();
-  AsyncProvider<AdminAreaPresenter> getContactPresenter();
+public interface ClientGinjector extends ClientGinjectorBase {
+  AsyncProvider<DialogSamplePresenter> getDialogSamplePresenter();
+  AsyncProvider<AdminAreaPresenter> getAdminAreaPresenter();
   AsyncProvider<SettingsPresenter> getSettingsPresenter();
-  EventBus getEventBus();
   AsyncProvider<HomeInfoPresenter> getHomeInfoPresenter();
   AsyncProvider<HomeNewsPresenter> getHomeNewsPresenter();
-  AsyncProvider<HomePresenter> getHomePresenter();
-  Provider<MainPagePresenter> getMainPagePresenter();
   PlaceManager getPlaceManager();
-  ProxyFailureHandler getProxyFailureHandler();
   MyConstants getMyConstants();
-  IsAdminGatekeeper getIsAdminGatekeeper();
-  
+
   // The following methods allow these widgets to be used in UiBinder files
   // and participate in dependency injection.
   LinkMenu getLinkMenu();

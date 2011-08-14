@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -18,37 +18,26 @@ package com.gwtplatform.samples.nested.client.presenter;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
-
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.proxy.NavigationEvent;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.samples.nested.client.NameTokens;
 
 /**
+ * The events are handled in {@link ContactPresenterBase}.
+ *
  * @author Christian Goudreau
+ * @author Philippe Beaudoin
  */
-public class ContactPresenter extends
-    Presenter<ContactPresenter.MyView, ContactPresenter.MyProxy> {
+public class ContactPresenter
+    extends ContactPresenterBase<ContactPresenter.MyProxy> {
   /**
    * {@link ContactPresenter}'s proxy.
    */
   @ProxyCodeSplit
   @NameToken(NameTokens.contactPage)
   public interface MyProxy extends ProxyPlace<ContactPresenter> {
-  }
-
-  String navigationHistory = "";
-
-  /**
-   * {@link ContactPresenter}'s view.
-   */
-  public interface MyView extends View {
-    void setNavigationHistory(String navigationHistory);
   }
 
   @Inject
@@ -60,20 +49,5 @@ public class ContactPresenter extends
   @Override
   protected void revealInParent() {
     RevealContentEvent.fire(this, MainPagePresenter.TYPE_SetMainContent, this);
-  }
-
-  /**
-   * We keep track of the previously visited pages.
-   * 
-   * @param event The
-   *          {@link com.gwtplatform.mvp.client.proxy.LockInteractionEvent}.
-   */
-  @ProxyEvent
-  public void onNavigation(NavigationEvent event) {
-    if (navigationHistory.length() > 0) {
-      navigationHistory += ", ";
-    }
-    navigationHistory += event.getRequest().getNameToken();
-    getView().setNavigationHistory(navigationHistory);
   }
 }

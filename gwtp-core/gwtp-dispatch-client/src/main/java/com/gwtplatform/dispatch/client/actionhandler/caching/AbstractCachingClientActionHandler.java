@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -22,11 +22,11 @@ import com.gwtplatform.dispatch.client.CallbackDispatchRequest;
 import com.gwtplatform.dispatch.client.CompletedDispatchRequest;
 import com.gwtplatform.dispatch.client.DefaultCallbackDispatchRequest;
 import com.gwtplatform.dispatch.client.DelagatingCallbackDispatchRequest;
-import com.gwtplatform.dispatch.client.DispatchRequest;
 import com.gwtplatform.dispatch.client.actionhandler.AbstractClientActionHandler;
 import com.gwtplatform.dispatch.client.actionhandler.ExecuteCommand;
 import com.gwtplatform.dispatch.client.actionhandler.UndoCommand;
 import com.gwtplatform.dispatch.shared.Action;
+import com.gwtplatform.dispatch.shared.DispatchRequest;
 import com.gwtplatform.dispatch.shared.Result;
 
 import java.util.ArrayList;
@@ -48,10 +48,10 @@ import java.util.HashMap;
  * <p>
  * 3. Flexibility of cache implementation to support custom caching
  * </p>
- * 
+ *
  * @param <A> The type of the action extending {@link Action}.
  * @param <R> The type of the result extending {@link Result}.
- * 
+ *
  * @author Sunny Gupta
  * @author David M. Chandler
  * @author Christian Goudreau
@@ -77,7 +77,7 @@ public abstract class AbstractCachingClientActionHandler<A extends Action<R>, R 
 
     if (pendingRequestCallbacks != null) {
       CallbackDispatchRequest<R> callbackDispatchRequest = new DefaultCallbackDispatchRequest<R>(resultCallback);
-      
+
       // Add callback to pending list and return
       pendingRequestCallbacks.add(callbackDispatchRequest);
 
@@ -100,7 +100,7 @@ public abstract class AbstractCachingClientActionHandler<A extends Action<R>, R 
               // Call postfetch with null result
               postfetch(action, null);
               resultCallback.onFailure(caught);
-              
+
               // Callback onFailure
               ArrayList<CallbackDispatchRequest<R>> pendingRequestCallbacks = pendingRequestCallbackMap.remove(action);
               for (CallbackDispatchRequest<R> pendingRequestCallback : pendingRequestCallbacks) {
@@ -128,12 +128,12 @@ public abstract class AbstractCachingClientActionHandler<A extends Action<R>, R 
 
       // Add pending callback
       ArrayList<CallbackDispatchRequest<R>> resultRequestCallbacks = new ArrayList<CallbackDispatchRequest<R>>();
-      
+
       CallbackDispatchRequest<R> callbackDispatchRequest = new DelagatingCallbackDispatchRequest<R>(request, resultCallback);
       resultRequestCallbacks.add(callbackDispatchRequest);
-      
+
       pendingRequestCallbackMap.put(action, resultRequestCallbacks);
-      
+
       return callbackDispatchRequest;
     }
   };
@@ -154,7 +154,7 @@ public abstract class AbstractCachingClientActionHandler<A extends Action<R>, R 
    * returns {@code null} then the action is executed on the server.
    * <p/>
    * You can use this method to fetch the {@code action} from the cache.
-   * 
+   *
    * @param action The action to be prefetched
    * @return The prefetched result. If not found, return {@code null}.
    */
@@ -168,7 +168,7 @@ public abstract class AbstractCachingClientActionHandler<A extends Action<R>, R 
    * <p/>
    * You can use this method to add the result to cache, if it is {@code null}
    * you should remove the {@code action} from the cache.
-   * 
+   *
    * @param action The action that just finished execution on the server.
    * @param result The result after the server call, or {@code null} if the
    *          server call failed.

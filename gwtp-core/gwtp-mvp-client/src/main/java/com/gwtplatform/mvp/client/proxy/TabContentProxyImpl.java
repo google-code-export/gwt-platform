@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,10 +16,7 @@
 
 package com.gwtplatform.mvp.client.proxy;
 
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
-import com.google.inject.Inject;
-
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.RequestTabsEvent;
 import com.gwtplatform.mvp.client.RequestTabsHandler;
@@ -28,7 +25,7 @@ import com.gwtplatform.mvp.client.TabData;
 
 /**
  * @param <T> The Presenter's type.
- * 
+ *
  * @author Philippe Beaudoin
  */
 public class TabContentProxyImpl<T extends Presenter<?, ?>> extends ProxyImpl<T>
@@ -62,11 +59,8 @@ public class TabContentProxyImpl<T extends Presenter<?, ?>> extends ProxyImpl<T>
   public Tab getTab() {
     return tab;
   }
-  
-  @Inject
-  @Override
-  protected void bind(ProxyFailureHandler failureHandler, EventBus eventBus) {
-    super.bind(failureHandler, eventBus);
+
+  protected void addRequestTabsHandler() {
     eventBus.addHandler(requestTabsEventType, new RequestTabsHandler() {
       @Override
       public void onRequestTabs(RequestTabsEvent event) {
