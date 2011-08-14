@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -18,13 +18,13 @@ package com.gwtplatform.tester;
 
 import com.gwtplatform.dispatch.client.CompletedDispatchRequest;
 import com.gwtplatform.dispatch.client.DelegatingDispatchRequest;
-import com.gwtplatform.dispatch.client.DispatchAsync;
-import com.gwtplatform.dispatch.client.DispatchRequest;
-import com.gwtplatform.dispatch.client.DispatchService;
 import com.gwtplatform.dispatch.client.actionhandler.ClientActionHandler;
 import com.gwtplatform.dispatch.client.actionhandler.ExecuteCommand;
 import com.gwtplatform.dispatch.client.actionhandler.UndoCommand;
 import com.gwtplatform.dispatch.shared.Action;
+import com.gwtplatform.dispatch.shared.DispatchAsync;
+import com.gwtplatform.dispatch.shared.DispatchRequest;
+import com.gwtplatform.dispatch.shared.DispatchService;
 import com.gwtplatform.dispatch.shared.Result;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * This class is an implementation of {@link DispatchAsync} for use with test
  * cases that configure guice using a {@link MockHandlerModule}.
- * 
+ *
  * @author Brendan Doherty
  */
 

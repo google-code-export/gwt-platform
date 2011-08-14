@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -21,17 +21,17 @@ import com.google.inject.Singleton;
 
 import com.gwtplatform.dispatch.client.DefaultExceptionHandler;
 import com.gwtplatform.dispatch.client.DefaultSecurityCookieAccessor;
-import com.gwtplatform.dispatch.client.DispatchAsync;
-import com.gwtplatform.dispatch.client.DispatchService;
 import com.gwtplatform.dispatch.client.ExceptionHandler;
-import com.gwtplatform.dispatch.client.SecurityCookieAccessor;
+import com.gwtplatform.dispatch.shared.DispatchAsync;
+import com.gwtplatform.dispatch.shared.DispatchService;
+import com.gwtplatform.dispatch.shared.SecurityCookieAccessor;
 
 /**
  * This class configures guice for use in test cases with a
  * {@link MockHandlerModule}.
- * 
+ *
  * @author Brendan Doherty
- * 
+ *
  */
 public class TestDispatchModule extends AbstractModule {
   @Override

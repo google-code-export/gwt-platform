@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.gwtplatform</groupId>
         <artifactId>gwtp</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.7-SNAPSHOT</version>
     </parent>
 
     <groupId>com.gwtplatform</groupId>
@@ -20,20 +20,14 @@
         <module>gwtp-dispatch-client</module>
         <module>gwtp-dispatch-shared</module>
         <module>gwtp-dispatch-server</module>
+        <module>gwtp-dispatch-server-guice</module>
+        <module>gwtp-dispatch-server-spring</module>
+        <module>gwtp-dispatch-test</module>
         <module>gwtp-tester</module>
         <module>gwtp-processors</module>
         <module>gwtp-crawler</module>
+        <module>gwtp-crawler-service</module>
     </modules>
-
-    <dependencies>
-        <!-- Allow junit to be inherited by every sub module -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
@@ -41,8 +35,63 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>${gwt-maven-plugin.version}</version>
+                <configuration>
+                    <extraJvmArgs>-Xss1024k -Xmx512M</extraJvmArgs>
+                    <includes>**/*GwtTest.java,**/*GwtTestSuite.java</includes>
+                    <mode>htmlunit</mode>
+                    <testTimeOut>180</testTimeOut>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>com.google.gwt</groupId>
+                        <artifactId>gwt-user</artifactId>
+                        <version>${gwt.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.google.gwt</groupId>
+                        <artifactId>gwt-dev</artifactId>
+                        <version>${gwt.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.google.gwt</groupId>
+                        <artifactId>gwt-servlet</artifactId>
+                        <version>${gwt.version}</version>
+                    </dependency>
+              </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
         </plugins>
     </build>
+
+    <!-- Dependencies that are inherited by sub-modules -->
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gwtp-build-tools</artifactId>
+        </dependency>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -53,6 +102,13 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>gwtp-crawler-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <!-- Even though this is not needed server-side, we do not use a provided
+                scope as this dependency is always included transitively. -->
                 <groupId>${project.groupId}</groupId>
                 <artifactId>gwtp-clients-common</artifactId>
                 <version>${project.version}</version>
@@ -66,6 +122,7 @@
                 <groupId>com.gwtplatform</groupId>
                 <artifactId>gwtp-dispatch-client</artifactId>
                 <version>${project.version}</version>
+                <scope>provided</scope> <!-- Not needed server-side -->
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -74,13 +131,31 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>gwtp-dispatch-server-guice</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>gwtp-dispatch-server-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>gwtp-dispatch-test</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>gwtp-mvp-client</artifactId>
                 <version>${project.version}</version>
+                <scope>provided</scope> <!-- Not needed server-side -->				
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>gwtp-processors</artifactId>
                 <version>${project.version}</version>
+                <scope>provided</scope> <!-- Not needed server-side -->
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -93,12 +168,19 @@
                 <groupId>com.google.gwt</groupId>
                 <artifactId>gwt-user</artifactId>
                 <version>${gwt.version}</version>
+                <scope>provided</scope> <!-- Not needed server-side -->
             </dependency>
             <dependency>
                 <groupId>com.google.gwt</groupId>
                 <artifactId>gwt-dev</artifactId>
                 <version>${gwt.version}</version>
-                <scope>provided</scope>
+                <scope>provided</scope> <!-- Not needed server-side -->
+            </dependency>
+            <dependency>
+                <groupId>com.google.gwt</groupId>
+                <artifactId>gwt-servlet</artifactId>
+                <version>${gwt.version}</version>
+                <scope>runtime</scope>
             </dependency>
 
             <!-- DI dependencies -->
@@ -113,6 +195,11 @@
                 <version>${guice.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-assistedinject</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>aopalliance</groupId>
                 <artifactId>aopalliance</artifactId>
                 <version>${aopalliance.version}</version>
@@ -121,6 +208,24 @@
                 <groupId>com.google.gwt.inject</groupId>
                 <artifactId>gin</artifactId>
                 <version>${gin.version}</version>
+                <scope>provided</scope> <!-- Not needed server-side -->
+            </dependency>
+
+            <!-- Standard Java extension jars -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${javax.inject.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>persistence-api</artifactId>
+                <version>${persistence-api.version}</version>
             </dependency>
 
             <!-- Test dependencies -->
@@ -144,10 +249,6 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>

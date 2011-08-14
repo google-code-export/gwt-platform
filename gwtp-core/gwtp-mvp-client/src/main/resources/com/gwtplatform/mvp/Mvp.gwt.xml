@@ -29,6 +29,6 @@
   </generate-with>
   
   <!-- Specify the paths for translatable code                    -->
-  <source path='client'/>
+  <source path='client' excludes="**/*Test.java,**/*TestSuite.java,**/*TestUtil.java" />
 
 </module>

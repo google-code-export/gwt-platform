@@ -1,12 +1,12 @@
 /**
- * Copyright 2010 ArcBees Inc.
- * 
+ * Copyright 2011 ArcBees Inc.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -19,7 +19,6 @@ package com.gwtplatform.samples.tab.client.presenter;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.inject.Inject;
-
 import com.gwtplatform.mvp.client.RequestTabsHandler;
 import com.gwtplatform.mvp.client.TabContainerPresenter;
 import com.gwtplatform.mvp.client.TabView;
@@ -27,6 +26,12 @@ import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.RequestTabs;
+import com.gwtplatform.mvp.client.proxy.AsyncCallFailEvent;
+import com.gwtplatform.mvp.client.proxy.AsyncCallFailHandler;
+import com.gwtplatform.mvp.client.proxy.AsyncCallStartEvent;
+import com.gwtplatform.mvp.client.proxy.AsyncCallStartHandler;
+import com.gwtplatform.mvp.client.proxy.AsyncCallSucceedEvent;
+import com.gwtplatform.mvp.client.proxy.AsyncCallSucceedHandler;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
@@ -38,14 +43,15 @@ import com.gwtplatform.samples.tab.client.CurrentUserChangedEvent.CurrentUserCha
  * of tabs allowing access to the various parts of the application.
  * Tabs are refreshed whenever the current user's privileges change in
  * order to hide areas that cannot be accessed.
- * 
+ *
  * @author Christian Goudreau
  * @author Philippe Beaudoin
  */
 public class MainPagePresenter
-    extends TabContainerPresenter<MainPagePresenter.MyView, MainPagePresenter.MyProxy> 
-    implements CurrentUserChangedHandler {
-  
+    extends TabContainerPresenter<MainPagePresenter.MyView, MainPagePresenter.MyProxy>
+    implements CurrentUserChangedHandler, AsyncCallStartHandler, AsyncCallFailHandler,
+    AsyncCallSucceedHandler {
+
   /**
    * {@link MainPagePresenter}'s proxy.
    */
@@ -58,6 +64,7 @@ public class MainPagePresenter
    */
   public interface MyView extends TabView {
     void refreshTabs();
+    void setTopMessage(String string);
   }
 
   /**
@@ -89,5 +96,22 @@ public class MainPagePresenter
   public void onCurrentUserChanged(CurrentUserChangedEvent event) {
     getView().refreshTabs();
   }
-  
+
+  @ProxyEvent
+  @Override
+  public void onAsyncCallStart(AsyncCallStartEvent event) {
+    getView().setTopMessage("Loading...");
+  }
+
+  @ProxyEvent
+  @Override
+  public void onAsyncCallFail(AsyncCallFailEvent event) {
+    getView().setTopMessage("Oops, something went wrong...");
+  }
+
+  @ProxyEvent
+  @Override
+  public void onAsyncCallSucceed(AsyncCallSucceedEvent event) {
+    getView().setTopMessage(null);
+  }
 }
