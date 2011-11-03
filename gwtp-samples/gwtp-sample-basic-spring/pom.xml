@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.gwtplatform</groupId>
+        <artifactId>gwtp-samples</artifactId>
+        <version>0.7-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>gwtp-sample-basic-spring</artifactId>
+    <packaging>war</packaging>
+    <name>GWTP Samples - basic Spring</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <configuration>
+                    <logLevel>INFO</logLevel>
+                    <style>${gwt.style}</style>
+                    <server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
+                    <hostedWebapp>${webappDirectory}</hostedWebapp>
+                    <copyWebapp>true</copyWebapp>
+                    <appEngineVersion>${gae.version}</appEngineVersion>
+                    <appEngineHome>${gae.home}</appEngineHome>
+                    <runTarget>Gwtpsamplespring.html</runTarget>
+                    <module>com.gwtplatform.samples.basicspring.Gwtpsamplespring</module>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <configuration>
+                    <useProjectReferences>false</useProjectReferences>
+                    <additionalBuildcommands>
+                        <buildcommand>com.google.gwt.eclipse.core.gwtProjectValidator</buildcommand>
+                    </additionalBuildcommands>
+                    <additionalProjectnatures>
+                        <projectnature>com.google.appengine.eclipse.core.gaeNature</projectnature>
+                        <projectnature>com.google.gwt.eclipse.core.gwtNature</projectnature>
+                    </additionalProjectnatures>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.gwtplatform</groupId>
+                        <artifactId>gwtp-build-tools</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Google Web Toolkit dependencies -->
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-servlet</artifactId>
+        </dependency>
+
+        <!-- AppEngine dependencies -->
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-1.0-sdk</artifactId>
+        </dependency>
+
+        <!-- DI dependencies -->
+        <dependency>
+            <groupId>com.google.gwt.inject</groupId>
+            <artifactId>gin</artifactId>
+        </dependency>
+
+        <!--  Spring dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- Activate this profile to compile the sample
+            including just the adequate GWTP dependencies -->
+            <id>default-samples</id>
+            <activation>
+                <property><name>!gwtp-all</name></property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>gwtp-mvp-client</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>gwtp-dispatch-client</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>gwtp-dispatch-server-spring</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <!-- Activate this profile to compile the sample
+            using the compound GWTP dependency (gwtp-all) -->
+            <id>gwtp-all-samples</id>
+            <activation>
+                <property><name>gwtp-all</name></property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>gwtp-all</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>
