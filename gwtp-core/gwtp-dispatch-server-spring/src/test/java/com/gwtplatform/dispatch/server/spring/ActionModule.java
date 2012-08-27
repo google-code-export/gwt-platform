@@ -30,7 +30,7 @@ import com.gwtplatform.dispatch.shared.action.TestAction;
  * @author Peter Simun
  */
 @Configuration
-@Import({DefaultModule.class, DispatchModule.class})
+@Import({DefaultModule.class})
 public class ActionModule extends HandlerModule {
 
   public ActionModule() {
